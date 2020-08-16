@@ -1,0 +1,33 @@
+---
+title: Almost Done
+author: Rob Stilson
+date: '2020-08-15'
+slug: almost-done
+categories:
+  - R rstudio
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-08-15T16:40:40-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+## Header 1
+
+This is some text
+
+## Header 2 - Title of h2
+
+```{r}
+my_data <- mtcars
+plot(mtcars)
+```
+
