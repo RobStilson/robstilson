@@ -7,6 +7,10 @@ education:
   - course: PhD in Industrial/Orgainzational Psychology
     institution: University of South Florida
     year: 2009
+  courses:
+  - course: BS in Psychology
+    institution: University of Georgia
+    year: 2003
 email: "robstilson@gmail.com"
 interests:
 - Data Science
