@@ -37,4 +37,4 @@ user_groups:
 - Visitors
 ---
 
-Rob Stilson is a Data Scientist, I-O Pscyhologist and Adjunct Professor.
+Rob Stilson is a Data Scientist, I-O Pscyhologist, and Adjunct Professor.
