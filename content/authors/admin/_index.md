@@ -4,7 +4,7 @@ authors:
 bio: My research interests include distributed robotics, mobile computing and programmable matter.
 education:
   courses:
-  - course: PhD in Industrial/Orgainzational Psychology
+  - course: PhD in Industrial/Organizational Psychology
     institution: University of South Florida
     year: 2009
   - course: BS in Psychology
@@ -40,4 +40,4 @@ user_groups:
 - Visitors
 ---
 
-Rob Stilson is a Data Scientist, I-O Pscyhologist, and Adjunct Professor. The purpose of this site is to blend I-O Psychology, Data Science, and HR together. I anticipate most of these post will be about People Analytics related topics as I've had trouble finding a lot of R/Python posts specifically related to HR type work. So, I will put everything that I've learned over the years into my post and hopefully if you have struggled with data wrangling, data visualization, model building, survey analysis, etc., you can find what you are looking for here.
+Rob Stilson is a Data Scientist, I-O Psychologist, and Adjunct Professor. The purpose of this site is to blend I-O Psychology, Data Science, and HR together. I anticipate most of these post will be about People Analytics related topics as I've had trouble finding a lot of R/Python posts specifically related to HR type work. So, I will put everything that I've learned over the years into my post and hopefully if you have struggled with data wrangling, data visualization, model building, survey analysis, etc., you can find what you are looking for here.
