@@ -1,7 +1,7 @@
 ---
 authors:
 - admin
-bio: My research interests include distributed robotics, mobile computing and programmable matter.
+bio: My research interests include people analytics, surveys, and applying machine learning to I-O psychology.
 education:
   courses:
   - course: PhD in Industrial/Organizational Psychology
