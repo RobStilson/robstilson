@@ -26,6 +26,6 @@ date_format = "Jan 2006"
   location = "Georgia"
   date_start = "2019-05-01"
   date_end = ""
-  description = """Taught advance analytics in R."""
+  description = """Taught advanced analytics in R."""
 
 +++
