@@ -427,17 +427,19 @@ Data &amp;lt;- read_excel(&amp;quot;D:/Folder where the file is located/WA_Fn-Us
 &lt;/div&gt;
 &lt;div id=&#34;skim-the-data&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Skim the data&lt;/h2&gt;
-&lt;p&gt;The &lt;code&gt;skimr&lt;/code&gt; package is useful to get some additional information on the data frame (df) with the &lt;code&gt;skim&lt;/code&gt; function. In addition to number of columns and rows, it gives you the following:
-* column type with frequency
-* any grouping variables
-* each column with number missing
-* if the column is ordered
-* number of unique occurrences in each column
-* top counts in each column
-* mean
-* standard deviation
-* quantiles
-* a mini histogram of the data&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;skimr&lt;/code&gt; package is useful to get some additional information on the data frame (df) with the &lt;code&gt;skim&lt;/code&gt; function. In addition to number of columns and rows, it gives you the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;column type with frequency&lt;/li&gt;
+&lt;li&gt;any grouping variables&lt;/li&gt;
+&lt;li&gt;each column with number missing&lt;/li&gt;
+&lt;li&gt;if the column is ordered&lt;/li&gt;
+&lt;li&gt;number of unique occurrences in each column&lt;/li&gt;
+&lt;li&gt;top counts in each column&lt;/li&gt;
+&lt;li&gt;mean&lt;/li&gt;
+&lt;li&gt;standard deviation&lt;/li&gt;
+&lt;li&gt;quantiles&lt;/li&gt;
+&lt;li&gt;a mini histogram of the data&lt;/li&gt;
+&lt;/ul&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;skim(Data)&lt;/code&gt;&lt;/pre&gt;
 &lt;table&gt;
 &lt;caption&gt;&lt;span id=&#34;tab:unnamed-chunk-13&#34;&gt;Table 1: &lt;/span&gt;Data summary&lt;/caption&gt;

@@ -188,6 +188,7 @@ glimpse(Data)
 ## Skim the data
 
 The `skimr` package is useful to get some additional information on the data frame (df) with the `skim` function. In addition to number of columns and rows, it gives you the following:
+
 * column type with frequency
 * any grouping variables
 * each column with number missing

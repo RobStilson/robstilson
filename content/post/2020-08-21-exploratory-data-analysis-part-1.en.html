@@ -427,17 +427,19 @@ Data &lt;- read_excel(&quot;D:/Folder where the file is located/WA_Fn-UseC_-HR-E
 </div>
 <div id="skim-the-data" class="section level2">
 <h2>Skim the data</h2>
-<p>The <code>skimr</code> package is useful to get some additional information on the data frame (df) with the <code>skim</code> function. In addition to number of columns and rows, it gives you the following:
-* column type with frequency
-* any grouping variables
-* each column with number missing
-* if the column is ordered
-* number of unique occurrences in each column
-* top counts in each column
-* mean
-* standard deviation
-* quantiles
-* a mini histogram of the data</p>
+<p>The <code>skimr</code> package is useful to get some additional information on the data frame (df) with the <code>skim</code> function. In addition to number of columns and rows, it gives you the following:</p>
+<ul>
+<li>column type with frequency</li>
+<li>any grouping variables</li>
+<li>each column with number missing</li>
+<li>if the column is ordered</li>
+<li>number of unique occurrences in each column</li>
+<li>top counts in each column</li>
+<li>mean</li>
+<li>standard deviation</li>
+<li>quantiles</li>
+<li>a mini histogram of the data</li>
+</ul>
 <pre class="r"><code>skim(Data)</code></pre>
 <table>
 <caption><span id="tab:unnamed-chunk-13">Table 1: </span>Data summary</caption>
