@@ -95,6 +95,11 @@ for (f in getNamespaceExports("tidylog")) {
 
 ```
 
+```{r}
+conflict_prefer("filter", "dplyr")
+```
+
+
 ## Bring in the data
 
 For this demonstration we'll use `attrition` directly from the `modeldata` package. We'll rename it `Data` so we don't overwrite anything.
