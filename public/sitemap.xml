@@ -33,17 +33,32 @@
   </url>
   
   <url>
-    <loc>http://robstilson.rbind.io/post/almost-done/</loc>
-    <lastmod>2020-08-15T16:40:40-04:00</lastmod>
+    <loc>http://robstilson.rbind.io/categories/</loc>
+    <lastmod>2020-08-21T14:51:39-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://robstilson.rbind.io/categories/</loc>
-    <lastmod>2020-08-15T16:40:40-04:00</lastmod>
+    <loc>http://robstilson.rbind.io/category/eda/</loc>
+    <lastmod>2020-08-21T14:51:39-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/post/exploratory-data-analysis-part-1/</loc>
+    <lastmod>2020-08-21T14:51:39-04:00</lastmod>
   </url>
   
   <url>
     <loc>http://robstilson.rbind.io/post/</loc>
+    <lastmod>2020-08-21T14:51:39-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/post/what-this-site-is-about/</loc>
+    <lastmod>2020-08-21T14:33:51-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/post/almost-done/</loc>
     <lastmod>2020-08-15T16:40:40-04:00</lastmod>
   </url>
   

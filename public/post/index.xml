@@ -5,12 +5,1193 @@
     <link>http://robstilson.rbind.io/post/</link>
       <atom:link href="http://robstilson.rbind.io/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sat, 15 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Fri, 21 Aug 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Posts</title>
       <link>http://robstilson.rbind.io/post/</link>
     </image>
+    
+    <item>
+      <title>Exploratory Data Analysis: Part 1</title>
+      <link>http://robstilson.rbind.io/post/exploratory-data-analysis-part-1/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
+      <guid>http://robstilson.rbind.io/post/exploratory-data-analysis-part-1/</guid>
+      <description>
+
+
+&lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Summary&lt;/h1&gt;
+&lt;p&gt;In this post I will introduce you to HR data from the IBM Watson Analytics Lab. The &lt;code&gt;modeldata&lt;/code&gt; package contains this as the &lt;code&gt;attrition&lt;/code&gt; data set. This data set is also available from &lt;a href=&#34;https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset&#34;&gt;Kaggle&lt;/a&gt;. Here is the description from the &lt;em&gt;Details&lt;/em&gt; portion of the documentation.&lt;/p&gt;
+&lt;p&gt;These data are from the IBM Watson Analytics Lab. The website describes the data with “Uncover the factors that lead to employee attrition and explore important questions such as ‘show me a breakdown of distance from home by job role and attrition’ or ‘compare average monthly income by education and attrition’. This is a fictional data set created by IBM data scientists.”. There are 1470 rows.&lt;/p&gt;
+&lt;div id=&#34;get-packages&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Get Packages&lt;/h2&gt;
+&lt;p&gt;This code chunk will load the necessary packages for the analysis. I’ve been using &lt;code&gt;pacman&lt;/code&gt; for years and I encourage you to check it out as well. The &lt;code&gt;tryCatch&lt;/code&gt; portion of the code will check your machine to see if &lt;code&gt;pacman&lt;/code&gt; has already been installed. If it finds &lt;code&gt;pacman&lt;/code&gt;, it will download it and if not it will move on. The &lt;code&gt;pacman::p_load&lt;/code&gt; function is a wrapper for &lt;code&gt;library&lt;/code&gt; and &lt;code&gt;require&lt;/code&gt; and checks to see if the listed packages are installed. If they are not, it will attempt to install them from CRAN and/or any other repository in the &lt;code&gt;pacman&lt;/code&gt; repository list (See &lt;em&gt;Description&lt;/em&gt; under &lt;code&gt;?p_load&lt;/code&gt; for additional information).&lt;/p&gt;
+&lt;p&gt;As a best practice, I also like to give a brief snippet of what each of the packages I’m loading will do in the analysis. This is helpful for anybody else who I send my code to, but also for myself if I need to come back to the code 6 months or more down the line.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;load-packages&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Load packages&lt;/h2&gt;
+&lt;p&gt;Here I’m explicitly calling the packages via &lt;code&gt;library&lt;/code&gt;. Notice that &lt;code&gt;tidylog&lt;/code&gt; is at the very end. This is necessary to load after &lt;code&gt;dplyr&lt;/code&gt; so that all of the functions from &lt;code&gt;tidylog&lt;/code&gt; work correctly. This is used in conjunction with the &lt;code&gt;conflicted&lt;/code&gt; package. You can read more about it &lt;a href=&#34;https://github.com/elbersb/tidylog/blob/master/README.md&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;conflict_prefer(&amp;quot;filter&amp;quot;, &amp;quot;dplyr&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [conflicted] Removing existing preference&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [conflicted] Will prefer dplyr::filter over any other package&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;bring-in-the-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Bring in the data&lt;/h2&gt;
+&lt;p&gt;For this demonstration we’ll use &lt;code&gt;attrition&lt;/code&gt; directly from the &lt;code&gt;modeldata&lt;/code&gt; package. We’ll rename it &lt;code&gt;Data&lt;/code&gt; so we don’t overwrite anything.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(modeldata)
+
+data(attrition)
+
+Data &amp;lt;- attrition&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;load-data-from-excel&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Load data from Excel&lt;/h2&gt;
+&lt;p&gt;If you downloaded the data set from Kaggle as an Excel file, you would used something like below. The easiest way to do this is probably to use File -&amp;gt; Import Data Set -&amp;gt; From Excel from the RStudio drop down menu.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(readxl)
+Data &amp;lt;- read_excel(&amp;quot;D:/Folder where the file is located/WA_Fn-UseC_-HR-Employee-Attrition.xlsx&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;head&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Head&lt;/h2&gt;
+&lt;p&gt;Ok, now that we’ve got our data into R, let’s start looking around.&lt;/p&gt;
+&lt;p&gt;First, we’ll use the &lt;code&gt;head&lt;/code&gt; function to see the first few rows.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   Age Attrition    BusinessTravel DailyRate           Department
+## 1  41       Yes     Travel_Rarely      1102                Sales
+## 2  49        No Travel_Frequently       279 Research_Development
+## 4  37       Yes     Travel_Rarely      1373 Research_Development
+## 5  33        No Travel_Frequently      1392 Research_Development
+## 7  27        No     Travel_Rarely       591 Research_Development
+## 8  32        No Travel_Frequently      1005 Research_Development
+##   DistanceFromHome     Education EducationField EnvironmentSatisfaction Gender
+## 1                1       College  Life_Sciences                  Medium Female
+## 2                8 Below_College  Life_Sciences                    High   Male
+## 4                2       College          Other               Very_High   Male
+## 5                3        Master  Life_Sciences               Very_High Female
+## 7                2 Below_College        Medical                     Low   Male
+## 8                2       College  Life_Sciences               Very_High   Male
+##   HourlyRate JobInvolvement JobLevel               JobRole JobSatisfaction
+## 1         94           High        2       Sales_Executive       Very_High
+## 2         61         Medium        2    Research_Scientist          Medium
+## 4         92         Medium        1 Laboratory_Technician            High
+## 5         56           High        1    Research_Scientist            High
+## 7         40           High        1 Laboratory_Technician          Medium
+## 8         79           High        1 Laboratory_Technician       Very_High
+##   MaritalStatus MonthlyIncome MonthlyRate NumCompaniesWorked OverTime
+## 1        Single          5993       19479                  8      Yes
+## 2       Married          5130       24907                  1       No
+## 4        Single          2090        2396                  6      Yes
+## 5       Married          2909       23159                  1      Yes
+## 7       Married          3468       16632                  9       No
+## 8        Single          3068       11864                  0       No
+##   PercentSalaryHike PerformanceRating RelationshipSatisfaction StockOptionLevel
+## 1                11         Excellent                      Low                0
+## 2                23       Outstanding                Very_High                1
+## 4                15         Excellent                   Medium                0
+## 5                11         Excellent                     High                0
+## 7                12         Excellent                Very_High                1
+## 8                13         Excellent                     High                0
+##   TotalWorkingYears TrainingTimesLastYear WorkLifeBalance YearsAtCompany
+## 1                 8                     0             Bad              6
+## 2                10                     3          Better             10
+## 4                 7                     3          Better              0
+## 5                 8                     3          Better              8
+## 7                 6                     3          Better              2
+## 8                 8                     2            Good              7
+##   YearsInCurrentRole YearsSinceLastPromotion YearsWithCurrManager
+## 1                  4                       0                    5
+## 2                  7                       1                    7
+## 4                  0                       0                    0
+## 5                  7                       3                    0
+## 7                  2                       2                    2
+## 8                  7                       3                    6&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we wanted to see the first 10 rows instead of the first 6 rows we can change it up with &lt;code&gt;n&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(Data, n = 10)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##    Age Attrition    BusinessTravel DailyRate           Department
+## 1   41       Yes     Travel_Rarely      1102                Sales
+## 2   49        No Travel_Frequently       279 Research_Development
+## 4   37       Yes     Travel_Rarely      1373 Research_Development
+## 5   33        No Travel_Frequently      1392 Research_Development
+## 7   27        No     Travel_Rarely       591 Research_Development
+## 8   32        No Travel_Frequently      1005 Research_Development
+## 10  59        No     Travel_Rarely      1324 Research_Development
+## 11  30        No     Travel_Rarely      1358 Research_Development
+## 12  38        No Travel_Frequently       216 Research_Development
+## 13  36        No     Travel_Rarely      1299 Research_Development
+##    DistanceFromHome     Education EducationField EnvironmentSatisfaction Gender
+## 1                 1       College  Life_Sciences                  Medium Female
+## 2                 8 Below_College  Life_Sciences                    High   Male
+## 4                 2       College          Other               Very_High   Male
+## 5                 3        Master  Life_Sciences               Very_High Female
+## 7                 2 Below_College        Medical                     Low   Male
+## 8                 2       College  Life_Sciences               Very_High   Male
+## 10                3      Bachelor        Medical                    High Female
+## 11               24 Below_College  Life_Sciences               Very_High   Male
+## 12               23      Bachelor  Life_Sciences               Very_High   Male
+## 13               27      Bachelor        Medical                    High   Male
+##    HourlyRate JobInvolvement JobLevel                   JobRole JobSatisfaction
+## 1          94           High        2           Sales_Executive       Very_High
+## 2          61         Medium        2        Research_Scientist          Medium
+## 4          92         Medium        1     Laboratory_Technician            High
+## 5          56           High        1        Research_Scientist            High
+## 7          40           High        1     Laboratory_Technician          Medium
+## 8          79           High        1     Laboratory_Technician       Very_High
+## 10         81      Very_High        1     Laboratory_Technician             Low
+## 11         67           High        1     Laboratory_Technician            High
+## 12         44         Medium        3    Manufacturing_Director            High
+## 13         94           High        2 Healthcare_Representative            High
+##    MaritalStatus MonthlyIncome MonthlyRate NumCompaniesWorked OverTime
+## 1         Single          5993       19479                  8      Yes
+## 2        Married          5130       24907                  1       No
+## 4         Single          2090        2396                  6      Yes
+## 5        Married          2909       23159                  1      Yes
+## 7        Married          3468       16632                  9       No
+## 8         Single          3068       11864                  0       No
+## 10       Married          2670        9964                  4      Yes
+## 11      Divorced          2693       13335                  1       No
+## 12        Single          9526        8787                  0       No
+## 13       Married          5237       16577                  6       No
+##    PercentSalaryHike PerformanceRating RelationshipSatisfaction
+## 1                 11         Excellent                      Low
+## 2                 23       Outstanding                Very_High
+## 4                 15         Excellent                   Medium
+## 5                 11         Excellent                     High
+## 7                 12         Excellent                Very_High
+## 8                 13         Excellent                     High
+## 10                20       Outstanding                      Low
+## 11                22       Outstanding                   Medium
+## 12                21       Outstanding                   Medium
+## 13                13         Excellent                   Medium
+##    StockOptionLevel TotalWorkingYears TrainingTimesLastYear WorkLifeBalance
+## 1                 0                 8                     0             Bad
+## 2                 1                10                     3          Better
+## 4                 0                 7                     3          Better
+## 5                 0                 8                     3          Better
+## 7                 1                 6                     3          Better
+## 8                 0                 8                     2            Good
+## 10                3                12                     3            Good
+## 11                1                 1                     2          Better
+## 12                0                10                     2          Better
+## 13                2                17                     3            Good
+##    YearsAtCompany YearsInCurrentRole YearsSinceLastPromotion
+## 1               6                  4                       0
+## 2              10                  7                       1
+## 4               0                  0                       0
+## 5               8                  7                       3
+## 7               2                  2                       2
+## 8               7                  7                       3
+## 10              1                  0                       0
+## 11              1                  0                       0
+## 12              9                  7                       1
+## 13              7                  7                       7
+##    YearsWithCurrManager
+## 1                     5
+## 2                     7
+## 4                     0
+## 5                     0
+## 7                     2
+## 8                     6
+## 10                    0
+## 11                    0
+## 12                    8
+## 13                    7&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;tail&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Tail&lt;/h2&gt;
+&lt;p&gt;We can also take a look at the bottom of the data with &lt;code&gt;tail&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tail(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##      Age Attrition    BusinessTravel DailyRate           Department
+## 2060  26        No     Travel_Rarely      1167                Sales
+## 2061  36        No Travel_Frequently       884 Research_Development
+## 2062  39        No     Travel_Rarely       613 Research_Development
+## 2064  27        No     Travel_Rarely       155 Research_Development
+## 2065  49        No Travel_Frequently      1023                Sales
+## 2068  34        No     Travel_Rarely       628 Research_Development
+##      DistanceFromHome     Education EducationField EnvironmentSatisfaction
+## 2060                5      Bachelor          Other               Very_High
+## 2061               23       College        Medical                    High
+## 2062                6 Below_College        Medical               Very_High
+## 2064                4      Bachelor  Life_Sciences                  Medium
+## 2065                2      Bachelor        Medical               Very_High
+## 2068                8      Bachelor        Medical                  Medium
+##      Gender HourlyRate JobInvolvement JobLevel                   JobRole
+## 2060 Female         30         Medium        1      Sales_Representative
+## 2061   Male         41      Very_High        2     Laboratory_Technician
+## 2062   Male         42         Medium        3 Healthcare_Representative
+## 2064   Male         87      Very_High        2    Manufacturing_Director
+## 2065   Male         63         Medium        2           Sales_Executive
+## 2068   Male         82      Very_High        2     Laboratory_Technician
+##      JobSatisfaction MaritalStatus MonthlyIncome MonthlyRate NumCompaniesWorked
+## 2060            High        Single          2966       21378                  0
+## 2061       Very_High       Married          2571       12290                  4
+## 2062             Low       Married          9991       21457                  4
+## 2064          Medium       Married          6142        5174                  1
+## 2065          Medium       Married          5390       13243                  2
+## 2068            High       Married          4404       10228                  2
+##      OverTime PercentSalaryHike PerformanceRating RelationshipSatisfaction
+## 2060       No                18         Excellent                Very_High
+## 2061       No                17         Excellent                     High
+## 2062       No                15         Excellent                      Low
+## 2064      Yes                20       Outstanding                   Medium
+## 2065       No                14         Excellent                Very_High
+## 2068       No                12         Excellent                      Low
+##      StockOptionLevel TotalWorkingYears TrainingTimesLastYear WorkLifeBalance
+## 2060                0                 5                     2          Better
+## 2061                1                17                     3          Better
+## 2062                1                 9                     5          Better
+## 2064                1                 6                     0          Better
+## 2065                0                17                     3            Good
+## 2068                0                 6                     3            Best
+##      YearsAtCompany YearsInCurrentRole YearsSinceLastPromotion
+## 2060              4                  2                       0
+## 2061              5                  2                       0
+## 2062              7                  7                       1
+## 2064              6                  2                       0
+## 2065              9                  6                       0
+## 2068              4                  3                       1
+##      YearsWithCurrManager
+## 2060                    0
+## 2061                    3
+## 2062                    7
+## 2064                    3
+## 2065                    8
+## 2068                    2&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;headtail&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;HeadTail&lt;/h2&gt;
+&lt;p&gt;And, if we would like to see both at once, we can use the &lt;code&gt;headTail&lt;/code&gt; function from the &lt;code&gt;psych&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;headTail(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##      Age Attrition    BusinessTravel DailyRate           Department
+## 1     41       Yes     Travel_Rarely      1102                Sales
+## 2     49        No Travel_Frequently       279 Research_Development
+## 4     37       Yes     Travel_Rarely      1373 Research_Development
+## 5     33        No Travel_Frequently      1392 Research_Development
+## ...  ...      &amp;lt;NA&amp;gt;              &amp;lt;NA&amp;gt;       ...                 &amp;lt;NA&amp;gt;
+## 2062  39        No     Travel_Rarely       613 Research_Development
+## 2064  27        No     Travel_Rarely       155 Research_Development
+## 2065  49        No Travel_Frequently      1023                Sales
+## 2068  34        No     Travel_Rarely       628 Research_Development
+##      DistanceFromHome     Education EducationField EnvironmentSatisfaction
+## 1                   1       College  Life_Sciences                  Medium
+## 2                   8 Below_College  Life_Sciences                    High
+## 4                   2       College          Other               Very_High
+## 5                   3        Master  Life_Sciences               Very_High
+## ...               ...          &amp;lt;NA&amp;gt;           &amp;lt;NA&amp;gt;                    &amp;lt;NA&amp;gt;
+## 2062                6 Below_College        Medical               Very_High
+## 2064                4      Bachelor  Life_Sciences                  Medium
+## 2065                2      Bachelor        Medical               Very_High
+## 2068                8      Bachelor        Medical                  Medium
+##      Gender HourlyRate JobInvolvement JobLevel                   JobRole
+## 1    Female         94           High        2           Sales_Executive
+## 2      Male         61         Medium        2        Research_Scientist
+## 4      Male         92         Medium        1     Laboratory_Technician
+## 5    Female         56           High        1        Research_Scientist
+## ...    &amp;lt;NA&amp;gt;        ...           &amp;lt;NA&amp;gt;      ...                      &amp;lt;NA&amp;gt;
+## 2062   Male         42         Medium        3 Healthcare_Representative
+## 2064   Male         87      Very_High        2    Manufacturing_Director
+## 2065   Male         63         Medium        2           Sales_Executive
+## 2068   Male         82      Very_High        2     Laboratory_Technician
+##      JobSatisfaction MaritalStatus MonthlyIncome MonthlyRate NumCompaniesWorked
+## 1          Very_High        Single          5993       19479                  8
+## 2             Medium       Married          5130       24907                  1
+## 4               High        Single          2090        2396                  6
+## 5               High       Married          2909       23159                  1
+## ...             &amp;lt;NA&amp;gt;          &amp;lt;NA&amp;gt;           ...         ...                ...
+## 2062             Low       Married          9991       21457                  4
+## 2064          Medium       Married          6142        5174                  1
+## 2065          Medium       Married          5390       13243                  2
+## 2068            High       Married          4404       10228                  2
+##      OverTime PercentSalaryHike PerformanceRating RelationshipSatisfaction
+## 1         Yes                11         Excellent                      Low
+## 2          No                23       Outstanding                Very_High
+## 4         Yes                15         Excellent                   Medium
+## 5         Yes                11         Excellent                     High
+## ...      &amp;lt;NA&amp;gt;               ...              &amp;lt;NA&amp;gt;                     &amp;lt;NA&amp;gt;
+## 2062       No                15         Excellent                      Low
+## 2064      Yes                20       Outstanding                   Medium
+## 2065       No                14         Excellent                Very_High
+## 2068       No                12         Excellent                      Low
+##      StockOptionLevel TotalWorkingYears TrainingTimesLastYear WorkLifeBalance
+## 1                   0                 8                     0             Bad
+## 2                   1                10                     3          Better
+## 4                   0                 7                     3          Better
+## 5                   0                 8                     3          Better
+## ...               ...               ...                   ...            &amp;lt;NA&amp;gt;
+## 2062                1                 9                     5          Better
+## 2064                1                 6                     0          Better
+## 2065                0                17                     3            Good
+## 2068                0                 6                     3            Best
+##      YearsAtCompany YearsInCurrentRole YearsSinceLastPromotion
+## 1                 6                  4                       0
+## 2                10                  7                       1
+## 4                 0                  0                       0
+## 5                 8                  7                       3
+## ...             ...                ...                     ...
+## 2062              7                  7                       1
+## 2064              6                  2                       0
+## 2065              9                  6                       0
+## 2068              4                  3                       1
+##      YearsWithCurrManager
+## 1                       5
+## 2                       7
+## 4                       0
+## 5                       0
+## ...                   ...
+## 2062                    7
+## 2064                    3
+## 2065                    8
+## 2068                    2&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we wanted to use the &lt;code&gt;headTail&lt;/code&gt; function without loading the &lt;code&gt;psych&lt;/code&gt; library or if we want to make it explicit that we are using that function from that package, we could have done the following as well.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;psych::headTail(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dimensions-of-the-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Dimensions of the data&lt;/h2&gt;
+&lt;p&gt;We can check out the dimensions of the data to get the number of rows and columns.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dim(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 1470   31&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;structure-of-the-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Structure of the data&lt;/h2&gt;
+&lt;p&gt;We can get the structure of the data.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;str(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## &amp;#39;data.frame&amp;#39;:    1470 obs. of  31 variables:
+##  $ Age                     : int  41 49 37 33 27 32 59 30 38 36 ...
+##  $ Attrition               : Factor w/ 2 levels &amp;quot;No&amp;quot;,&amp;quot;Yes&amp;quot;: 2 1 2 1 1 1 1 1 1 1 ...
+##  $ BusinessTravel          : Factor w/ 3 levels &amp;quot;Non-Travel&amp;quot;,&amp;quot;Travel_Frequently&amp;quot;,..: 3 2 3 2 3 2 3 3 2 3 ...
+##  $ DailyRate               : int  1102 279 1373 1392 591 1005 1324 1358 216 1299 ...
+##  $ Department              : Factor w/ 3 levels &amp;quot;Human_Resources&amp;quot;,..: 3 2 2 2 2 2 2 2 2 2 ...
+##  $ DistanceFromHome        : int  1 8 2 3 2 2 3 24 23 27 ...
+##  $ Education               : Ord.factor w/ 5 levels &amp;quot;Below_College&amp;quot;&amp;lt;..: 2 1 2 4 1 2 3 1 3 3 ...
+##  $ EducationField          : Factor w/ 6 levels &amp;quot;Human_Resources&amp;quot;,..: 2 2 5 2 4 2 4 2 2 4 ...
+##  $ EnvironmentSatisfaction : Ord.factor w/ 4 levels &amp;quot;Low&amp;quot;&amp;lt;&amp;quot;Medium&amp;quot;&amp;lt;..: 2 3 4 4 1 4 3 4 4 3 ...
+##  $ Gender                  : Factor w/ 2 levels &amp;quot;Female&amp;quot;,&amp;quot;Male&amp;quot;: 1 2 2 1 2 2 1 2 2 2 ...
+##  $ HourlyRate              : int  94 61 92 56 40 79 81 67 44 94 ...
+##  $ JobInvolvement          : Ord.factor w/ 4 levels &amp;quot;Low&amp;quot;&amp;lt;&amp;quot;Medium&amp;quot;&amp;lt;..: 3 2 2 3 3 3 4 3 2 3 ...
+##  $ JobLevel                : int  2 2 1 1 1 1 1 1 3 2 ...
+##  $ JobRole                 : Factor w/ 9 levels &amp;quot;Healthcare_Representative&amp;quot;,..: 8 7 3 7 3 3 3 3 5 1 ...
+##  $ JobSatisfaction         : Ord.factor w/ 4 levels &amp;quot;Low&amp;quot;&amp;lt;&amp;quot;Medium&amp;quot;&amp;lt;..: 4 2 3 3 2 4 1 3 3 3 ...
+##  $ MaritalStatus           : Factor w/ 3 levels &amp;quot;Divorced&amp;quot;,&amp;quot;Married&amp;quot;,..: 3 2 3 2 2 3 2 1 3 2 ...
+##  $ MonthlyIncome           : int  5993 5130 2090 2909 3468 3068 2670 2693 9526 5237 ...
+##  $ MonthlyRate             : int  19479 24907 2396 23159 16632 11864 9964 13335 8787 16577 ...
+##  $ NumCompaniesWorked      : int  8 1 6 1 9 0 4 1 0 6 ...
+##  $ OverTime                : Factor w/ 2 levels &amp;quot;No&amp;quot;,&amp;quot;Yes&amp;quot;: 2 1 2 2 1 1 2 1 1 1 ...
+##  $ PercentSalaryHike       : int  11 23 15 11 12 13 20 22 21 13 ...
+##  $ PerformanceRating       : Ord.factor w/ 4 levels &amp;quot;Low&amp;quot;&amp;lt;&amp;quot;Good&amp;quot;&amp;lt;&amp;quot;Excellent&amp;quot;&amp;lt;..: 3 4 3 3 3 3 4 4 4 3 ...
+##  $ RelationshipSatisfaction: Ord.factor w/ 4 levels &amp;quot;Low&amp;quot;&amp;lt;&amp;quot;Medium&amp;quot;&amp;lt;..: 1 4 2 3 4 3 1 2 2 2 ...
+##  $ StockOptionLevel        : int  0 1 0 0 1 0 3 1 0 2 ...
+##  $ TotalWorkingYears       : int  8 10 7 8 6 8 12 1 10 17 ...
+##  $ TrainingTimesLastYear   : int  0 3 3 3 3 2 3 2 2 3 ...
+##  $ WorkLifeBalance         : Ord.factor w/ 4 levels &amp;quot;Bad&amp;quot;&amp;lt;&amp;quot;Good&amp;quot;&amp;lt;&amp;quot;Better&amp;quot;&amp;lt;..: 1 3 3 3 3 2 2 3 3 2 ...
+##  $ YearsAtCompany          : int  6 10 0 8 2 7 1 1 9 7 ...
+##  $ YearsInCurrentRole      : int  4 7 0 7 2 7 0 0 7 7 ...
+##  $ YearsSinceLastPromotion : int  0 1 0 3 2 3 0 0 1 7 ...
+##  $ YearsWithCurrManager    : int  5 7 0 0 2 6 0 0 8 7 ...&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;glimpse-the-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Glimpse the data&lt;/h2&gt;
+&lt;p&gt;A similar way to get this information is the &lt;code&gt;glimpse&lt;/code&gt; function from &lt;code&gt;dplyr&lt;/code&gt;. A benefit of &lt;code&gt;glimpse&lt;/code&gt; is there doesn’t seem to be a limit on the number of columns it can display where &lt;code&gt;str&lt;/code&gt; seems to have a limit of the first 99.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;glimpse(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Rows: 1,470
+## Columns: 31
+## $ Age                      &amp;lt;int&amp;gt; 41, 49, 37, 33, 27, 32, 59, 30, 38, 36, 35...
+## $ Attrition                &amp;lt;fct&amp;gt; Yes, No, Yes, No, No, No, No, No, No, No, ...
+## $ BusinessTravel           &amp;lt;fct&amp;gt; Travel_Rarely, Travel_Frequently, Travel_R...
+## $ DailyRate                &amp;lt;int&amp;gt; 1102, 279, 1373, 1392, 591, 1005, 1324, 13...
+## $ Department               &amp;lt;fct&amp;gt; Sales, Research_Development, Research_Deve...
+## $ DistanceFromHome         &amp;lt;int&amp;gt; 1, 8, 2, 3, 2, 2, 3, 24, 23, 27, 16, 15, 2...
+## $ Education                &amp;lt;ord&amp;gt; College, Below_College, College, Master, B...
+## $ EducationField           &amp;lt;fct&amp;gt; Life_Sciences, Life_Sciences, Other, Life_...
+## $ EnvironmentSatisfaction  &amp;lt;ord&amp;gt; Medium, High, Very_High, Very_High, Low, V...
+## $ Gender                   &amp;lt;fct&amp;gt; Female, Male, Male, Female, Male, Male, Fe...
+## $ HourlyRate               &amp;lt;int&amp;gt; 94, 61, 92, 56, 40, 79, 81, 67, 44, 94, 84...
+## $ JobInvolvement           &amp;lt;ord&amp;gt; High, Medium, Medium, High, High, High, Ve...
+## $ JobLevel                 &amp;lt;int&amp;gt; 2, 2, 1, 1, 1, 1, 1, 1, 3, 2, 1, 2, 1, 1, ...
+## $ JobRole                  &amp;lt;fct&amp;gt; Sales_Executive, Research_Scientist, Labor...
+## $ JobSatisfaction          &amp;lt;ord&amp;gt; Very_High, Medium, High, High, Medium, Ver...
+## $ MaritalStatus            &amp;lt;fct&amp;gt; Single, Married, Single, Married, Married,...
+## $ MonthlyIncome            &amp;lt;int&amp;gt; 5993, 5130, 2090, 2909, 3468, 3068, 2670, ...
+## $ MonthlyRate              &amp;lt;int&amp;gt; 19479, 24907, 2396, 23159, 16632, 11864, 9...
+## $ NumCompaniesWorked       &amp;lt;int&amp;gt; 8, 1, 6, 1, 9, 0, 4, 1, 0, 6, 0, 0, 1, 0, ...
+## $ OverTime                 &amp;lt;fct&amp;gt; Yes, No, Yes, Yes, No, No, Yes, No, No, No...
+## $ PercentSalaryHike        &amp;lt;int&amp;gt; 11, 23, 15, 11, 12, 13, 20, 22, 21, 13, 13...
+## $ PerformanceRating        &amp;lt;ord&amp;gt; Excellent, Outstanding, Excellent, Excelle...
+## $ RelationshipSatisfaction &amp;lt;ord&amp;gt; Low, Very_High, Medium, High, Very_High, H...
+## $ StockOptionLevel         &amp;lt;int&amp;gt; 0, 1, 0, 0, 1, 0, 3, 1, 0, 2, 1, 0, 1, 1, ...
+## $ TotalWorkingYears        &amp;lt;int&amp;gt; 8, 10, 7, 8, 6, 8, 12, 1, 10, 17, 6, 10, 5...
+## $ TrainingTimesLastYear    &amp;lt;int&amp;gt; 0, 3, 3, 3, 3, 2, 3, 2, 2, 3, 5, 3, 1, 2, ...
+## $ WorkLifeBalance          &amp;lt;ord&amp;gt; Bad, Better, Better, Better, Better, Good,...
+## $ YearsAtCompany           &amp;lt;int&amp;gt; 6, 10, 0, 8, 2, 7, 1, 1, 9, 7, 5, 9, 5, 2,...
+## $ YearsInCurrentRole       &amp;lt;int&amp;gt; 4, 7, 0, 7, 2, 7, 0, 0, 7, 7, 4, 5, 2, 2, ...
+## $ YearsSinceLastPromotion  &amp;lt;int&amp;gt; 0, 1, 0, 3, 2, 3, 0, 0, 1, 7, 0, 0, 4, 1, ...
+## $ YearsWithCurrManager     &amp;lt;int&amp;gt; 5, 7, 0, 0, 2, 6, 0, 0, 8, 7, 3, 8, 3, 2, ...&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;skim-the-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Skim the data&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;skimr&lt;/code&gt; package is useful to get some additional information on the data frame (df) with the &lt;code&gt;skim&lt;/code&gt; function. In addition to number of columns and rows, it gives you the following:
+* column type with frequency
+* any grouping variables
+* each column with number missing
+* if the column is ordered
+* number of unique occurrences in each column
+* top counts in each column
+* mean
+* standard deviation
+* quantiles
+* a mini histogram of the data&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;skim(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;caption&gt;&lt;span id=&#34;tab:unnamed-chunk-13&#34;&gt;Table 1: &lt;/span&gt;Data summary&lt;/caption&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Name&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Data&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Number of rows&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1470&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Number of columns&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;31&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;_______________________&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Column type frequency:&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;factor&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;15&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;numeric&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;16&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;________________________&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Group variables&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;None&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;Variable type: factor&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;skim_variable&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;n_missing&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;complete_rate&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;ordered&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;n_unique&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;top_counts&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Attrition&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;FALSE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;No: 1233, Yes: 237&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;BusinessTravel&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;FALSE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Tra: 1043, Tra: 277, Non: 150&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Department&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;FALSE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Res: 961, Sal: 446, Hum: 63&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Education&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;TRUE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Bac: 572, Mas: 398, Col: 282, Bel: 170&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;EducationField&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;FALSE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Lif: 606, Med: 464, Mar: 159, Tec: 132&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;EnvironmentSatisfaction&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;TRUE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Hig: 453, Ver: 446, Med: 287, Low: 284&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Gender&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;FALSE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Mal: 882, Fem: 588&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;JobInvolvement&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;TRUE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Hig: 868, Med: 375, Ver: 144, Low: 83&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;JobRole&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;FALSE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Sal: 326, Res: 292, Lab: 259, Man: 145&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;JobSatisfaction&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;TRUE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Ver: 459, Hig: 442, Low: 289, Med: 280&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;MaritalStatus&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;FALSE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Mar: 673, Sin: 470, Div: 327&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;OverTime&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;FALSE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;No: 1054, Yes: 416&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;PerformanceRating&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;TRUE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Exc: 1244, Out: 226, Low: 0, Goo: 0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;RelationshipSatisfaction&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;TRUE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Hig: 459, Ver: 432, Med: 303, Low: 276&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;WorkLifeBalance&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;TRUE&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Bet: 893, Goo: 344, Bes: 153, Bad: 80&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;Variable type: numeric&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;skim_variable&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;n_missing&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;complete_rate&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;mean&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;sd&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p0&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p25&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p50&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p75&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p100&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;hist&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Age&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;36.92&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9.14&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;30&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;36.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;43.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;60&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▂▇▇▃▂&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;DailyRate&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;802.49&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;403.51&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;102&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;465&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;802.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1157.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1499&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▇▇▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;DistanceFromHome&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9.19&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;8.11&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;14.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;29&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▅▂▂▂&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;HourlyRate&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;65.89&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;20.33&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;30&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;48&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;66.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;83.75&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;100&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▇▇▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;JobLevel&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.06&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.11&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▇▃▂▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;MonthlyIncome&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6502.93&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4707.96&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1009&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2911&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4919.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;8379.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;19999&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▅▂▁▂&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;MonthlyRate&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;14313.10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7117.79&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2094&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;8047&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;14235.5&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;20461.50&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;26999&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▇▇▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;NumCompaniesWorked&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.69&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.50&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▃▂▂▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;PercentSalaryHike&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15.21&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.66&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;11&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;12&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;14.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;25&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▅▃▂▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;StockOptionLevel&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.79&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.85&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▇▁▂▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;TotalWorkingYears&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;11.28&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.78&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;40&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▇▂▁▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;TrainingTimesLastYear&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.80&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.29&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▂▇▇▂▃&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;YearsAtCompany&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.01&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.13&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;40&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▂▁▁▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;YearsInCurrentRole&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.23&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.62&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▃▂▁▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;YearsSinceLastPromotion&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.22&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▁▁▁▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;YearsWithCurrManager&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.12&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.57&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;17&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▂▅▁▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div id=&#34;describe-the-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Describe the data&lt;/h2&gt;
+&lt;p&gt;We can lean on the &lt;code&gt;psych&lt;/code&gt; package again with the &lt;code&gt;describe&lt;/code&gt; function to get some information about the df.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;describe(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                           vars    n     mean      sd  median  trimmed     mad
+## Age                          1 1470    36.92    9.14    36.0    36.47    8.90
+## Attrition*                   2 1470     1.16    0.37     1.0     1.08    0.00
+## BusinessTravel*              3 1470     2.61    0.67     3.0     2.76    0.00
+## DailyRate                    4 1470   802.49  403.51   802.0   803.83  510.01
+## Department*                  5 1470     2.26    0.53     2.0     2.25    0.00
+## DistanceFromHome             6 1470     9.19    8.11     7.0     8.08    7.41
+## Education*                   7 1470     2.91    1.02     3.0     2.98    1.48
+## EducationField*              8 1470     3.25    1.33     3.0     3.10    1.48
+## EnvironmentSatisfaction*     9 1470     2.72    1.09     3.0     2.78    1.48
+## Gender*                     10 1470     1.60    0.49     2.0     1.62    0.00
+## HourlyRate                  11 1470    65.89   20.33    66.0    66.02   26.69
+## JobInvolvement*             12 1470     2.73    0.71     3.0     2.74    0.00
+## JobLevel                    13 1470     2.06    1.11     2.0     1.90    1.48
+## JobRole*                    14 1470     5.46    2.46     6.0     5.61    2.97
+## JobSatisfaction*            15 1470     2.73    1.10     3.0     2.79    1.48
+## MaritalStatus*              16 1470     2.10    0.73     2.0     2.12    1.48
+## MonthlyIncome               17 1470  6502.93 4707.96  4919.0  5667.24 3260.24
+## MonthlyRate                 18 1470 14313.10 7117.79 14235.5 14286.48 9201.76
+## NumCompaniesWorked          19 1470     2.69    2.50     2.0     2.36    1.48
+## OverTime*                   20 1470     1.28    0.45     1.0     1.23    0.00
+## PercentSalaryHike           21 1470    15.21    3.66    14.0    14.80    2.97
+## PerformanceRating*          22 1470     3.15    0.36     3.0     3.07    0.00
+## RelationshipSatisfaction*   23 1470     2.71    1.08     3.0     2.77    1.48
+## StockOptionLevel            24 1470     0.79    0.85     1.0     0.67    1.48
+## TotalWorkingYears           25 1470    11.28    7.78    10.0    10.37    5.93
+## TrainingTimesLastYear       26 1470     2.80    1.29     3.0     2.72    1.48
+## WorkLifeBalance*            27 1470     2.76    0.71     3.0     2.77    0.00
+## YearsAtCompany              28 1470     7.01    6.13     5.0     5.99    4.45
+## YearsInCurrentRole          29 1470     4.23    3.62     3.0     3.85    4.45
+## YearsSinceLastPromotion     30 1470     2.19    3.22     1.0     1.48    1.48
+## YearsWithCurrManager        31 1470     4.12    3.57     3.0     3.77    4.45
+##                            min   max range  skew kurtosis     se
+## Age                         18    60    42  0.41    -0.41   0.24
+## Attrition*                   1     2     1  1.84     1.39   0.01
+## BusinessTravel*              1     3     2 -1.44     0.69   0.02
+## DailyRate                  102  1499  1397  0.00    -1.21  10.52
+## Department*                  1     3     2  0.17    -0.40   0.01
+## DistanceFromHome             1    29    28  0.96    -0.23   0.21
+## Education*                   1     5     4 -0.29    -0.56   0.03
+## EducationField*              1     6     5  0.55    -0.69   0.03
+## EnvironmentSatisfaction*     1     4     3 -0.32    -1.20   0.03
+## Gender*                      1     2     1 -0.41    -1.83   0.01
+## HourlyRate                  30   100    70 -0.03    -1.20   0.53
+## JobInvolvement*              1     4     3 -0.50     0.26   0.02
+## JobLevel                     1     5     4  1.02     0.39   0.03
+## JobRole*                     1     9     8 -0.36    -1.20   0.06
+## JobSatisfaction*             1     4     3 -0.33    -1.22   0.03
+## MaritalStatus*               1     3     2 -0.15    -1.12   0.02
+## MonthlyIncome             1009 19999 18990  1.37     0.99 122.79
+## MonthlyRate               2094 26999 24905  0.02    -1.22 185.65
+## NumCompaniesWorked           0     9     9  1.02     0.00   0.07
+## OverTime*                    1     2     1  0.96    -1.07   0.01
+## PercentSalaryHike           11    25    14  0.82    -0.31   0.10
+## PerformanceRating*           3     4     1  1.92     1.68   0.01
+## RelationshipSatisfaction*    1     4     3 -0.30    -1.19   0.03
+## StockOptionLevel             0     3     3  0.97     0.35   0.02
+## TotalWorkingYears            0    40    40  1.11     0.91   0.20
+## TrainingTimesLastYear        0     6     6  0.55     0.48   0.03
+## WorkLifeBalance*             1     4     3 -0.55     0.41   0.02
+## YearsAtCompany               0    40    40  1.76     3.91   0.16
+## YearsInCurrentRole           0    18    18  0.92     0.47   0.09
+## YearsSinceLastPromotion      0    15    15  1.98     3.59   0.08
+## YearsWithCurrManager         0    17    17  0.83     0.16   0.09&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;save-describe-as-a-df&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Save &lt;code&gt;describe&lt;/code&gt; as a DF&lt;/h2&gt;
+&lt;p&gt;If you want, you could save this to its own df so that you could then export it to Excel for a key stakeholder.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Desc_Data &amp;lt;- as.data.frame(describe(Data))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;round-describe-and-save-as-a-df&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Round &lt;code&gt;describe&lt;/code&gt; and save as a DF&lt;/h2&gt;
+&lt;p&gt;That’s pretty gnarly. Let’s see if we can round that to 3 decimal places.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Desc_Data &amp;lt;- round(as.data.frame(describe(Data)),3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Much better!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;write-to-excel&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Write to Excel&lt;/h2&gt;
+&lt;p&gt;To send it to an Excel file we simply call upon &lt;code&gt;openxlsx&lt;/code&gt; with the &lt;code&gt;write.xlsx&lt;/code&gt; function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;openxlsx::write.xlsx(Desc_Data, &amp;quot;00_Data/Descriptive Statistics for Data.xlsx&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;add-an-id-column&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Add an ID column&lt;/h2&gt;
+&lt;p&gt;If we want to add and ID column, we can use the &lt;code&gt;mutate&lt;/code&gt; function from &lt;code&gt;dplyr&lt;/code&gt; to create a new variable. Here we will create a new object called &lt;code&gt;TEST&lt;/code&gt; just in case this doesn’t go according to plan.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;TEST &amp;lt;- Data %&amp;gt;%
+  mutate(ID = row_number())&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## mutate: new variable &amp;#39;ID&amp;#39; (integer) with 1,470 unique values and 0% NA&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And we’ll take a look at our new DF.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(TEST)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   Age Attrition    BusinessTravel DailyRate           Department
+## 1  41       Yes     Travel_Rarely      1102                Sales
+## 2  49        No Travel_Frequently       279 Research_Development
+## 3  37       Yes     Travel_Rarely      1373 Research_Development
+## 4  33        No Travel_Frequently      1392 Research_Development
+## 5  27        No     Travel_Rarely       591 Research_Development
+## 6  32        No Travel_Frequently      1005 Research_Development
+##   DistanceFromHome     Education EducationField EnvironmentSatisfaction Gender
+## 1                1       College  Life_Sciences                  Medium Female
+## 2                8 Below_College  Life_Sciences                    High   Male
+## 3                2       College          Other               Very_High   Male
+## 4                3        Master  Life_Sciences               Very_High Female
+## 5                2 Below_College        Medical                     Low   Male
+## 6                2       College  Life_Sciences               Very_High   Male
+##   HourlyRate JobInvolvement JobLevel               JobRole JobSatisfaction
+## 1         94           High        2       Sales_Executive       Very_High
+## 2         61         Medium        2    Research_Scientist          Medium
+## 3         92         Medium        1 Laboratory_Technician            High
+## 4         56           High        1    Research_Scientist            High
+## 5         40           High        1 Laboratory_Technician          Medium
+## 6         79           High        1 Laboratory_Technician       Very_High
+##   MaritalStatus MonthlyIncome MonthlyRate NumCompaniesWorked OverTime
+## 1        Single          5993       19479                  8      Yes
+## 2       Married          5130       24907                  1       No
+## 3        Single          2090        2396                  6      Yes
+## 4       Married          2909       23159                  1      Yes
+## 5       Married          3468       16632                  9       No
+## 6        Single          3068       11864                  0       No
+##   PercentSalaryHike PerformanceRating RelationshipSatisfaction StockOptionLevel
+## 1                11         Excellent                      Low                0
+## 2                23       Outstanding                Very_High                1
+## 3                15         Excellent                   Medium                0
+## 4                11         Excellent                     High                0
+## 5                12         Excellent                Very_High                1
+## 6                13         Excellent                     High                0
+##   TotalWorkingYears TrainingTimesLastYear WorkLifeBalance YearsAtCompany
+## 1                 8                     0             Bad              6
+## 2                10                     3          Better             10
+## 3                 7                     3          Better              0
+## 4                 8                     3          Better              8
+## 5                 6                     3          Better              2
+## 6                 8                     2            Good              7
+##   YearsInCurrentRole YearsSinceLastPromotion YearsWithCurrManager ID
+## 1                  4                       0                    5  1
+## 2                  7                       1                    7  2
+## 3                  0                       0                    0  3
+## 4                  7                       3                    0  4
+## 5                  2                       2                    2  5
+## 6                  7                       3                    6  6&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It has added it to the very end. We would like to put this as the first column. There are a few ways to do this. Using the &lt;code&gt;select&lt;/code&gt; function, we can name the &lt;code&gt;ID&lt;/code&gt; column we just created and use the &lt;code&gt;everything&lt;/code&gt; function to tell it to put &lt;code&gt;ID&lt;/code&gt; first and then put &lt;code&gt;everything&lt;/code&gt; after &lt;code&gt;ID&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;TEST &amp;lt;- TEST %&amp;gt;%
+  select(ID, everything())&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select: columns reordered (ID, Age, Attrition, BusinessTravel, DailyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(TEST)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   ID Age Attrition    BusinessTravel DailyRate           Department
+## 1  1  41       Yes     Travel_Rarely      1102                Sales
+## 2  2  49        No Travel_Frequently       279 Research_Development
+## 3  3  37       Yes     Travel_Rarely      1373 Research_Development
+## 4  4  33        No Travel_Frequently      1392 Research_Development
+## 5  5  27        No     Travel_Rarely       591 Research_Development
+## 6  6  32        No Travel_Frequently      1005 Research_Development
+##   DistanceFromHome     Education EducationField EnvironmentSatisfaction Gender
+## 1                1       College  Life_Sciences                  Medium Female
+## 2                8 Below_College  Life_Sciences                    High   Male
+## 3                2       College          Other               Very_High   Male
+## 4                3        Master  Life_Sciences               Very_High Female
+## 5                2 Below_College        Medical                     Low   Male
+## 6                2       College  Life_Sciences               Very_High   Male
+##   HourlyRate JobInvolvement JobLevel               JobRole JobSatisfaction
+## 1         94           High        2       Sales_Executive       Very_High
+## 2         61         Medium        2    Research_Scientist          Medium
+## 3         92         Medium        1 Laboratory_Technician            High
+## 4         56           High        1    Research_Scientist            High
+## 5         40           High        1 Laboratory_Technician          Medium
+## 6         79           High        1 Laboratory_Technician       Very_High
+##   MaritalStatus MonthlyIncome MonthlyRate NumCompaniesWorked OverTime
+## 1        Single          5993       19479                  8      Yes
+## 2       Married          5130       24907                  1       No
+## 3        Single          2090        2396                  6      Yes
+## 4       Married          2909       23159                  1      Yes
+## 5       Married          3468       16632                  9       No
+## 6        Single          3068       11864                  0       No
+##   PercentSalaryHike PerformanceRating RelationshipSatisfaction StockOptionLevel
+## 1                11         Excellent                      Low                0
+## 2                23       Outstanding                Very_High                1
+## 3                15         Excellent                   Medium                0
+## 4                11         Excellent                     High                0
+## 5                12         Excellent                Very_High                1
+## 6                13         Excellent                     High                0
+##   TotalWorkingYears TrainingTimesLastYear WorkLifeBalance YearsAtCompany
+## 1                 8                     0             Bad              6
+## 2                10                     3          Better             10
+## 3                 7                     3          Better              0
+## 4                 8                     3          Better              8
+## 5                 6                     3          Better              2
+## 6                 8                     2            Good              7
+##   YearsInCurrentRole YearsSinceLastPromotion YearsWithCurrManager
+## 1                  4                       0                    5
+## 2                  7                       1                    7
+## 3                  0                       0                    0
+## 4                  7                       3                    0
+## 5                  2                       2                    2
+## 6                  7                       3                    6&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We could have also used the new &lt;code&gt;relocate&lt;/code&gt; function from &lt;code&gt;dplyr&lt;/code&gt; to do the same thing and tell it to put &lt;code&gt;ID&lt;/code&gt; before &lt;code&gt;Age&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;TEST &amp;lt;- TEST %&amp;gt;%
+  relocate(ID, .before = Age)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## relocate: no changes&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(TEST)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   ID Age Attrition    BusinessTravel DailyRate           Department
+## 1  1  41       Yes     Travel_Rarely      1102                Sales
+## 2  2  49        No Travel_Frequently       279 Research_Development
+## 3  3  37       Yes     Travel_Rarely      1373 Research_Development
+## 4  4  33        No Travel_Frequently      1392 Research_Development
+## 5  5  27        No     Travel_Rarely       591 Research_Development
+## 6  6  32        No Travel_Frequently      1005 Research_Development
+##   DistanceFromHome     Education EducationField EnvironmentSatisfaction Gender
+## 1                1       College  Life_Sciences                  Medium Female
+## 2                8 Below_College  Life_Sciences                    High   Male
+## 3                2       College          Other               Very_High   Male
+## 4                3        Master  Life_Sciences               Very_High Female
+## 5                2 Below_College        Medical                     Low   Male
+## 6                2       College  Life_Sciences               Very_High   Male
+##   HourlyRate JobInvolvement JobLevel               JobRole JobSatisfaction
+## 1         94           High        2       Sales_Executive       Very_High
+## 2         61         Medium        2    Research_Scientist          Medium
+## 3         92         Medium        1 Laboratory_Technician            High
+## 4         56           High        1    Research_Scientist            High
+## 5         40           High        1 Laboratory_Technician          Medium
+## 6         79           High        1 Laboratory_Technician       Very_High
+##   MaritalStatus MonthlyIncome MonthlyRate NumCompaniesWorked OverTime
+## 1        Single          5993       19479                  8      Yes
+## 2       Married          5130       24907                  1       No
+## 3        Single          2090        2396                  6      Yes
+## 4       Married          2909       23159                  1      Yes
+## 5       Married          3468       16632                  9       No
+## 6        Single          3068       11864                  0       No
+##   PercentSalaryHike PerformanceRating RelationshipSatisfaction StockOptionLevel
+## 1                11         Excellent                      Low                0
+## 2                23       Outstanding                Very_High                1
+## 3                15         Excellent                   Medium                0
+## 4                11         Excellent                     High                0
+## 5                12         Excellent                Very_High                1
+## 6                13         Excellent                     High                0
+##   TotalWorkingYears TrainingTimesLastYear WorkLifeBalance YearsAtCompany
+## 1                 8                     0             Bad              6
+## 2                10                     3          Better             10
+## 3                 7                     3          Better              0
+## 4                 8                     3          Better              8
+## 5                 6                     3          Better              2
+## 6                 8                     2            Good              7
+##   YearsInCurrentRole YearsSinceLastPromotion YearsWithCurrManager
+## 1                  4                       0                    5
+## 2                  7                       1                    7
+## 3                  0                       0                    0
+## 4                  7                       3                    0
+## 5                  2                       2                    2
+## 6                  7                       3                    6&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now that we know this is going to work we can simply save &lt;code&gt;Data&lt;/code&gt; as the updated &lt;code&gt;Data&lt;/code&gt; object with our new &lt;code&gt;ID&lt;/code&gt; variable located before &lt;code&gt;Age&lt;/code&gt; like so.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data &amp;lt;- Data %&amp;gt;% 
+    mutate(ID = row_number()) %&amp;gt;%
+  relocate(ID, .before = Age)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## mutate: new variable &amp;#39;ID&amp;#39; (integer) with 1,470 unique values and 0% NA&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## relocate: columns reordered (ID, Age, Attrition, BusinessTravel, DailyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(Data)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   ID Age Attrition    BusinessTravel DailyRate           Department
+## 1  1  41       Yes     Travel_Rarely      1102                Sales
+## 2  2  49        No Travel_Frequently       279 Research_Development
+## 3  3  37       Yes     Travel_Rarely      1373 Research_Development
+## 4  4  33        No Travel_Frequently      1392 Research_Development
+## 5  5  27        No     Travel_Rarely       591 Research_Development
+## 6  6  32        No Travel_Frequently      1005 Research_Development
+##   DistanceFromHome     Education EducationField EnvironmentSatisfaction Gender
+## 1                1       College  Life_Sciences                  Medium Female
+## 2                8 Below_College  Life_Sciences                    High   Male
+## 3                2       College          Other               Very_High   Male
+## 4                3        Master  Life_Sciences               Very_High Female
+## 5                2 Below_College        Medical                     Low   Male
+## 6                2       College  Life_Sciences               Very_High   Male
+##   HourlyRate JobInvolvement JobLevel               JobRole JobSatisfaction
+## 1         94           High        2       Sales_Executive       Very_High
+## 2         61         Medium        2    Research_Scientist          Medium
+## 3         92         Medium        1 Laboratory_Technician            High
+## 4         56           High        1    Research_Scientist            High
+## 5         40           High        1 Laboratory_Technician          Medium
+## 6         79           High        1 Laboratory_Technician       Very_High
+##   MaritalStatus MonthlyIncome MonthlyRate NumCompaniesWorked OverTime
+## 1        Single          5993       19479                  8      Yes
+## 2       Married          5130       24907                  1       No
+## 3        Single          2090        2396                  6      Yes
+## 4       Married          2909       23159                  1      Yes
+## 5       Married          3468       16632                  9       No
+## 6        Single          3068       11864                  0       No
+##   PercentSalaryHike PerformanceRating RelationshipSatisfaction StockOptionLevel
+## 1                11         Excellent                      Low                0
+## 2                23       Outstanding                Very_High                1
+## 3                15         Excellent                   Medium                0
+## 4                11         Excellent                     High                0
+## 5                12         Excellent                Very_High                1
+## 6                13         Excellent                     High                0
+##   TotalWorkingYears TrainingTimesLastYear WorkLifeBalance YearsAtCompany
+## 1                 8                     0             Bad              6
+## 2                10                     3          Better             10
+## 3                 7                     3          Better              0
+## 4                 8                     3          Better              8
+## 5                 6                     3          Better              2
+## 6                 8                     2            Good              7
+##   YearsInCurrentRole YearsSinceLastPromotion YearsWithCurrManager
+## 1                  4                       0                    5
+## 2                  7                       1                    7
+## 3                  0                       0                    0
+## 4                  7                       3                    0
+## 5                  2                       2                    2
+## 6                  7                       3                    6&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Notice we did both of those steps together. To do this we used a pipe, &lt;code&gt;%&amp;gt;%&lt;/code&gt;. Pipes are very useful for string steps of a code together in an easy to read and easy to follow fashion. I typically pronounce &lt;code&gt;%&amp;gt;%&lt;/code&gt; as “then”. So, we mutated our new &lt;code&gt;ID&lt;/code&gt; varable to correspond to row number &lt;em&gt;then&lt;/em&gt; we relocated our &lt;code&gt;ID&lt;/code&gt; variable to be before &lt;code&gt;Age&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>What this site is about</title>
+      <link>http://robstilson.rbind.io/post/what-this-site-is-about/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
+      <guid>http://robstilson.rbind.io/post/what-this-site-is-about/</guid>
+      <description>
+
+
+&lt;div id=&#34;welcome&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Welcome!&lt;/h1&gt;
+&lt;p&gt;Welcome to the blog! My main purpose in creating this site is to show those doing I-O Psychology and Human Resources (HR) type work, the way that I use R, Python, and occasionally Tableau in my work.&lt;/p&gt;
+&lt;p&gt;This can cover several of the topics listed below among others:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;data wrangling&lt;/li&gt;
+&lt;li&gt;data visualization&lt;/li&gt;
+&lt;li&gt;data imputation&lt;/li&gt;
+&lt;li&gt;data modeling&lt;/li&gt;
+&lt;li&gt;traditional statistics&lt;/li&gt;
+&lt;li&gt;machine learning&lt;/li&gt;
+&lt;li&gt;model deployment&lt;/li&gt;
+&lt;li&gt;dashboards&lt;/li&gt;
+&lt;li&gt;automation&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Most of the post I come across on these types of tasks use anything but HR type data that I can relate to. So, I’m hoping that if you have stopped by here, you can get a head start on applying some of the previously mentioned topics to your work.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;about-me&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;About me&lt;/h1&gt;
+&lt;p&gt;I got my BA in Psychology from the University of Georgia and then my Master’s and Ph.D. from the University of South Florida in Industrial-Organizational Psychology. In my work career, I’ve done a good deal of survey work along with validation studies, assessment creation, and both internal and external consulting.&lt;/p&gt;
+&lt;p&gt;I’m also currently teaching advanced analytics in R to Master’s level students with a large emphasis on applicability (e.g. model interpretability, explainability, and return on investment). I want to give my students skills that are immediately applicable in the workplace.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;programming-background&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Programming background&lt;/h1&gt;
+&lt;p&gt;Very little! I came from SPSS and after hitting one too many walls with what I was trying to do with my analysis, slowly started picking up R. I’m a loquacious coder who usually writes more comments than code, but that has saved my bacon 6 months to a year down the road on many occasions. I encourage you to comment on the different ways that you would have handled the particular task I’ve blogged about because on several occasions I have someone point out a new or different method that has saved me several hours of work.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Almost Done</title>
