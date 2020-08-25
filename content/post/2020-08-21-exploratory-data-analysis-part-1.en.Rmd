@@ -1,0 +1,274 @@
+---
+title: 'Exploratory Data Analysis: Part 1'
+author: Rob Stilson
+date: '2020-08-21'
+slug: exploratory-data-analysis-part-1
+categories:
+  - EDA
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-08-21T14:51:39-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+# Summary
+
+In this post I will introduce you to HR data from the IBM Watson Analytics Lab. The `modeldata` package contains this as the `attrition` data set. This data set is also available from [Kaggle](https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset). Here is the description from the *Details* portion of the documentation.
+
+These data are from the IBM Watson Analytics Lab. The website describes the data with “Uncover the factors that lead to employee attrition and explore important questions such as ‘show me a breakdown of distance from home by job role and attrition’ or ‘compare average monthly income by education and attrition’. This is a fictional data set created by IBM data scientists.”. There are 1470 rows.
+
+## Get Packages
+
+This code chunk will load the necessary packages for the analysis. I've been using `pacman` for years and I encourage you to check it out as well. The `tryCatch` portion of the code will check your machine to see if `pacman` has already been installed. If it finds `pacman`, it will download it and if not it will move on. The `pacman::p_load` function is a wrapper for `library` and `require` and checks to see if the listed packages are installed. If they are not, it will attempt to install them from CRAN and/or any other repository in the `pacman` repository list (See *Description* under `?p_load` for additional information).
+
+As a best practice, I also like to give a brief snippet of what each of the packages I'm loading will do in the analysis. This is helpful for anybody else who I send my code to, but also for myself if I need to come back to the code 6 months or more down the line.
+
+```{r load packages, echo = FALSE, include= FALSE, warning = FALSE, message = FALSE}
+#' <!-- ####################################################################################################### -->
+#' <!-- ####################################################################################################### -->
+#' <!-- ##################################LOADING PACKAGES##################################################### -->
+
+tryCatch(require(pacman),finally=utils:::install.packages(pkgs='pacman',repos='http://cran.r-project.org'));
+require(pacman)
+
+# if the above doesn't work, use this code#
+# tryCatch
+# detach("package:pacman", unload = TRUE)
+# install.packages("pacman", dependencies = TRUE)
+# install.packages("pacman")
+
+pacman::p_load(modeldata, # data sets useful for modeling packages
+               dplyr, # a grammar of data manipulation
+               tidyr, # tidy messy data
+               readxl, # read Excel files
+               ggplot2, # create elegant data visualisations using the grammar of graphics
+               knitr, # a general-purpose package for dynamic report generation in R
+               broom, # convert statistical objects into tidy tibbles
+               purrr, # functional programming tools
+               psych, #procedures for psychological, psychometric, and personality research
+               conflicted, # an alternative conflict resolution strategy for like named function in different libraries
+               janitor, # simple tools for examining and cleaning dirty data
+               skimr, # compact and flexible summaries of data
+               openxlsx, # read write and edit xlsx files
+               tidyquant, # tidy quantitative financial analysis
+               tidylog # logging for `dplyr` and `tidyr` functions
+)
+
+```
+
+## Load packages
+
+Here I'm explicitly calling the packages via `library`. Notice that `tidylog` is at the very end. This is necessary to load after `dplyr` so that all of the functions from `tidylog` work correctly. This is used in conjunction with the `conflicted` package. You can read more about it [here](https://github.com/elbersb/tidylog/blob/master/README.md).
+
+```{r, echo = FALSE, include= FALSE, warning = FALSE, message = FALSE}
+
+#' <!-- #Loading libraries -->
+
+suppressPackageStartupMessages({
+  library(modeldata)      
+  library(dplyr)
+  library(tidyr)
+  library(readxl)
+  library(ggplot2)
+  library(knitr)
+  library(broom)
+  library(purrr)
+  library(psych)
+  library(conflicted)
+  library(janitor)
+  library(skimr)
+  library(openxlsx)
+  library(tidyquant)
+  library(tidylog, warn.conflicts = FALSE)
+})
+
+for (f in getNamespaceExports("tidylog")) {
+    conflicted::conflict_prefer(f, "tidylog", quiet = TRUE)
+}
+
+```
+
+## Bring in the data
+
+For this demonstration we'll use `attrition` directly from the `modeldata` package. We'll rename it `Data` so we don't overwrite anything.
+
+```{r}
+library(modeldata)
+
+Data <- attrition
+```
+
+## Load data from Excel
+
+If you downloaded the data set from Kaggle as an Excel file, you would used something like below. The easiest way to do this is probably to use File -> Import Data Set -> From Excel from the RStudio drop down menu.
+
+```{r}
+library(readxl)
+Data <- read_excel("D:/Folder where the file is located/WA_Fn-UseC_-HR-Employee-Attrition.xlsx")
+```
+
+## Head
+
+Ok, now that we've got our data into R, let's start looking around.
+
+First, we'll use the `head` function to see the first few rows.
+
+```{r}
+head(Data)
+```
+
+ 
+If we wanted to see the first 10 rows instead of the first 6 rows we can change it up with `n`.
+
+```{r}
+head(Data, n = 10)
+```
+
+## Tail
+
+We can also take a look at the bottom of the data with `tail`.
+
+```{r}
+tail(Data)
+```
+
+## HeadTail
+
+And, if we would like to see both at once, we can use the `headTail` function from the `psych` package.
+
+```{r}
+headTail(Data)
+```
+
+If we wanted to use the `headTail` function without loading the `psych` library or if we want to make it explicit that we are using that function from that package, we could have done the following as well.
+
+```{r, eval = FALSE}
+psych::headTail(Data)
+```
+
+## Dimensions of the data
+
+We can check out the dimensions of the data to get the number of rows and columns.
+
+```{r}
+dim(Data)
+```
+
+## Structure of the data
+
+We can get the structure of the data.
+
+```{r}
+str(Data)
+```
+
+## Glimpse the data
+
+A similar way to get this information is the `glimpse` function from `dplyr`. A benefit of `glimpse` is there doesn't seem to be a limit on the number of columns it can display where `str` seems to have a limit of the first 99.
+
+```{r}
+glimpse(Data)
+```
+
+## Skim the data
+
+The `skimr` package is useful to get some additional information on the data frame (df) with the `skim` function. In addition to number of columns and rows, it gives you the following:
+* column type with frequency
+* any grouping variables
+* each column with number missing
+* if the column is ordered 
+* number of unique occurrences in each column
+* top counts in each column 
+* mean
+* standard deviation
+* quantiles
+* a mini histogram of the data
+
+```{r}
+skim(Data)
+```
+
+## Describe the data
+
+We can lean on the `psych` package again with the `describe` function to get some information about the df.
+
+```{r}
+describe(Data)
+```
+## Save `describe` as a DF
+
+If you want, you could save this to its own df so that you could then export it to Excel for a key stakeholder.
+
+```{r}
+Desc_Data <- as.data.frame(describe(Data))
+```
+
+## Round `describe` and save as a DF
+
+That's pretty gnarly. Let's see if we can round that to 3 decimal places.
+
+```{r}
+Desc_Data <- round(as.data.frame(describe(Data)),3)
+```
+
+Much better!
+
+## Write to Excel
+
+To send it to an Excel file we simply call upon `openxlsx` with the `write.xlsx` function.
+
+```{r, eval = FALSE}
+openxlsx::write.xlsx(Desc_Data, "00_Data/Descriptive Statistics for Data.xlsx")
+```
+
+## Add an ID column
+
+If we want to add and ID column, we can use the `mutate` function from `dplyr` to create a new variable. Here we will create a new object called `TEST` just in case this doesn't go according to plan.
+
+```{r}
+TEST <- Data %>%
+  mutate(ID = row_number())
+```
+
+And we'll take a look at our new DF.
+
+```{r}
+head(TEST)
+```
+
+It has added it to the very end. We would like to put this as the first column. There are a few ways to do this. Using the `select` function, we can name the `ID` column we just created and use the `everything` function to tell it to put `ID` first and then put `everything` after `ID`.
+
+```{r}
+TEST <- TEST %>%
+  select(ID, everything())
+
+head(TEST)
+```
+
+We could have also used the new `relocate` function from `dplyr` to do the same thing and tell it to put `ID` before `Age`.
+
+```{r}
+TEST <- TEST %>%
+  relocate(ID, .before = Age)
+
+head(TEST)
+```
+
+Now that we know this is going to work we can simply save `Data` as the updated `Data` object with our new `ID` variable located before `Age` like so.
+
+```{r}
+Data <- Data %>% 
+    mutate(ID = row_number()) %>%
+  relocate(ID, .before = Age)
+
+head(Data)
+```
+
+Notice we did both of those steps together. To do this we used a pipe, `%>%`. Pipes are very useful for string steps of a code together in an easy to read and easy to follow fashion. I typically pronounce `%>%` as "then". So, we mutated our new `ID` varable to correspond to row number *then* we relocated our `ID` variable to be before `Age`.

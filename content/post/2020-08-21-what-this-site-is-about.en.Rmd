@@ -1,0 +1,50 @@
+---
+title: What this site is about
+author: Rob Stilson
+date: '2020-08-21'
+slug: what-this-site-is-about
+categories: []
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-08-21T14:33:51-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+# Welcome!
+
+Welcome to the blog! My main purpose in creating this site is to show those doing I-O Psychology and Human Resources (HR) type work, the way that I use R, Python, and occasionally Tableau in my work. 
+
+This can cover several of the topics listed below among others:
+
+* data wrangling
+* data visualization
+* data imputation
+* data modeling
+* traditional statistics
+* machine learning
+* model deployment
+* dashboards 
+* automation
+
+Most of the post I come across on these types of tasks use anything but HR type data that I can relate to. So, I'm hoping that if you have stopped by here, you can get a head start on applying some of the previously mentioned topics to your work.
+
+# About me
+
+I got my BA in Psychology from the University of Georgia and then my Master's and Ph.D. from the University of South Florida in Industrial-Organizational Psychology. In my work career, I've done a good deal of survey work along with validation studies, assessment creation, and both internal and external consulting.
+
+I'm also currently teaching advanced analytics in R to Master's level students with a large emphasis on applicability (e.g. model interpretability, explainability, and return on investment). I want to give my students skills that are immediately applicable in the workplace.
+
+# Programming background
+
+Very little! I came from SPSS and after hitting one too many walls with what I was trying to do with my analysis, slowly started picking up R. I'm a loquacious coder who usually writes more comments than code, but that has saved my bacon 6 months to a year down the road on many occasions. I encourage you to comment on the different ways that you would have handled the particular task I've blogged about because on several occasions I have someone point out a new or different method that has saved me several hours of work.
+
+
+
+
