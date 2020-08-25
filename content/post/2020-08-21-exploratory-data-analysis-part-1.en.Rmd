@@ -104,8 +104,11 @@ conflict_prefer("filter", "dplyr")
 
 For this demonstration we'll use `attrition` directly from the `modeldata` package. We'll rename it `Data` so we don't overwrite anything.
 
+
 ```{r}
 library(modeldata)
+
+data(attrition)
 
 Data <- attrition
 ```
@@ -114,7 +117,7 @@ Data <- attrition
 
 If you downloaded the data set from Kaggle as an Excel file, you would used something like below. The easiest way to do this is probably to use File -> Import Data Set -> From Excel from the RStudio drop down menu.
 
-```{r}
+```{r, eval = FALSE}
 library(readxl)
 Data <- read_excel("D:/Folder where the file is located/WA_Fn-UseC_-HR-Employee-Attrition.xlsx")
 ```
