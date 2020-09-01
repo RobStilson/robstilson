@@ -281,3 +281,184 @@ head(Data)
 ```
 
 Notice we did both of those steps together. To do this we used a pipe, `%>%`. Pipes are very useful for string steps of a code together in an easy to read and easy to follow fashion. I typically pronounce `%>%` as "then". So, we mutated our new `ID` varable to correspond to row number *then* we relocated our `ID` variable to be before `Age`.
+
+# Character Data
+
+Now we will get to know the character variables a little bit better. 
+
+I learned the following methodology from Matt Dancho's (@mdancho84) data science class at [business.science.io](business.science.io). If you are interested in applying R to business problems, I highly recommend you check his classes out.
+
+We're now going to use some more of our `dplyr` verbs. First up is `select_if`. This makes it easier to select certain types of data. In this case, it will be character data. We can pair it with `is.character` and pipe in `glimpse`.
+
+```{r}
+Data %>%
+  select_if(is.character) %>%
+  glimpse()
+```
+
+If you've enabled `tidylog`, you see that `select_if: dropped all variables`. I forgot that the built in version of the `Attrition` data had already been factorized. Let's try again and swap out `is.factor` for `is.character`.
+
+```{r}
+Data %>%
+  select_if(is.factor) %>%
+  glimpse()
+```
+
+Much better! We can now see more information about the 15 columns it returned. 
+
+Now let us take a look at the unique variables within each column. We will call up the `map` feature from `purrr`.
+
+```{r}
+Data %>%
+    select_if(is.factor) %>%
+    map(unique) #from purrr
+```
+
+Since these are factors, in addition to the unique values, it also gives us the levels. Notice `WorkLifeBalance` at the very bottom and the levels of Bad < Good < Better < Best. This is showing that Bad is less than Good which is less than Better and so on. We'll revisit how to do this in a later post as the data almost never hits your inbox  with this information included.
+
+Another way to look at the data is to use the `table` function. We will swap out `unique` for `table` within `map`.
+
+```{r}
+Data %>%
+    select_if(is.factor) %>%
+    map(table)
+```
+
+This way of looking at the data is very helpful since you can begin to get a feel for the factors. `Performance` rating has 0 for both `Low` and `Good`. This may be accurate or it may be some faulty data. Seeing this let's you reach out to whoever would know and either check off on the data or realize a mistake has been made before you go further in your analysis. 
+
+You can also get proportions if that helps you to understand the data better. I won't go too much into how this works here, but we may step through this a bit more in a future post if you are interested in doing so.
+
+```{r}
+# To get proportions
+Data %>%
+    select_if(is.factor) %>%
+    map(~ table(.) %>% prop.table()) #anonymous function
+```
+
+This now gives us the proportions, but I struggle with anything more than about 2 or 3 decimals. Let's go ahead and clean this up a bit. We have wrapped everything in the `round` function. Also, notice that I didn't always know how to do this. I've put where I learned how do to this as a URL I've commented out from [stackoverflow.com](stackoverflow.com). Remember to leave yourself breadcrumbs to find your way home! You may not need these breadcrumbs tomorrow, but you will thank yourself when you have to come back to your code 6 months or more down the road. I also think the breadcrumbs are helpful if you have to share your code. 
+
+```{r}
+# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %>%
+    select_if(is.factor) %>%
+    map(~ round(table(.) %>% prop.table(), 2)) #anonymous function
+```
+
+Rounded to 2 decimal places looks much better to my eye. If 3 looks better to yours, simply swap out the 2 for a 3.
+
+```{r}
+# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %>%
+    select_if(is.factor) %>%
+    map(~ round(table(.) %>% prop.table(), 3)) #anonymous function
+```
+
+Remember, there are also usually multiple ways of doing things in R. We could have accomplished the same thing with the following code. I say choose whichever coding style looks better to you.
+
+
+```{r}
+# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %>%
+    select_if(is.factor) %>%
+    map(~round(prop.table(table(.x)),2))
+          
+```
+
+We could have also utilized the `tabyl` function from `janitor`, but now I'm going down a bit of a rabbit hole. The point is, mess around with the code and the data. Make it your own.
+
+```{r}
+Data %>%
+    select_if(is.factor) %>%
+    map(tabyl)
+```
+
+```{r}
+
+Data %>%
+    select_if(is.factor) %>%
+    map(tabyl)
+
+# Data %>%
+#     select_if(is.factor) %>%
+#     map(~ round(table(.) %>% prop.table(), 3)) #anonymous function
+```
+
+# Numeric Data
+
+I also enjoy Matt Dancho's way of looking at numeric data so I wanted to include this. The code below should look pretty familiar. We are just swapping out `is.numeric` for `is.factor`. Adding `length` simply tells us how many unique values are in each numeric variable. So, as expected, we see 1470 for `ID` which makes sense because we have 1470 rows. 
+
+```{r}
+Data %>%
+    select_if(is.numeric) %>%
+    map(~ unique(.) %>% length())
+```
+
+Changing out `map` for `map_df` will turn this into a data frame. That makes it easier to export the file to something like Excel.
+
+```{r}
+Data %>%
+    select_if(is.numeric) %>%
+    map_df(~ unique(.) %>% length()) # tries to turn it into a df instead of a list
+```
+
+Throwing `gather` after the pipe will make the data tall or pivot it.
+
+```{r}
+Data %>%
+    select_if(is.numeric) %>%
+    map_df(~ unique(.) %>% length()) %>% # tries to turn it into a df instead of a list
+    gather()
+```
+We can pipe in `arrange` and set it to `desc` for descending to get the values from most to least.
+
+```{r}
+Data %>%
+    select_if(is.numeric) %>%
+    map_df(~ unique(.) %>% length()) %>% # tries to turn it into a df instead of a list
+    gather() %>%
+    arrange(desc(value)) # Move the largest value to the top and go descending 
+```
+
+Now it would be super easy to save it as a new object like `Values_for_Excel` or something like that to export with `openxlsx::write.xlsx`. We'll cover that more in a later post.
+
+```{r}
+Values_for_Excel <- Data %>%
+    select_if(is.numeric) %>%
+    map_df(~ unique(.) %>% length()) %>% # tries to turn it into a df instead of a list
+    gather() %>%
+    arrange(desc(value)) # Move the largest value to the top and go descending 
+```
+
+`Values_for_Excel` now appears as a new df in your Global Environment.
+
+A neat trick I learned from Matt Dancho's class is the following for determining if a numeric variables is more likely continuous or discrete.
+
+Values higher than 10 are probably continuous. `PercenetSalaryHike`, `YearsSinceLastPromotion`, etc. 
+```{r}
+Data %>%
+    select_if(is.numeric) %>%
+    map_df(~ unique(.) %>% length()) %>% # tries to turn it into a df instead of a list
+    gather() %>%
+    arrange(value) %>%
+    filter(value > 10) #probably continuous if more than 10
+```
+
+Values less than 10 are probably discrete. `JobLevel`, `NumCompaniesWorked`, etc. 
+
+```{r}
+Data %>%
+    select_if(is.numeric) %>%
+    map_df(~ unique(.) %>% length()) %>% # tries to turn it into a df instead of a list
+    gather() %>%
+    arrange(value) %>%
+    filter(value <= 10) #probably discrete if less than 10
+```
+
+You may need to change 10 to be a little lower or higher to differentiate your specific data, but it is a great place to start. 
+
+# Wrap up
+
+That is it for now. Hopefully you have found something you can use here. Keep coming back as we will start to visualize the data and add to it as we try to make it more and more like something you will encounter in your work place. 

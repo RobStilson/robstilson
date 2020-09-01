@@ -1219,6 +1219,945 @@ Data &amp;lt;- read_excel(&amp;quot;D:/Folder where the file is located/WA_Fn-Us
 &lt;p&gt;Notice we did both of those steps together. To do this we used a pipe, &lt;code&gt;%&amp;gt;%&lt;/code&gt;. Pipes are very useful for string steps of a code together in an easy to read and easy to follow fashion. I typically pronounce &lt;code&gt;%&amp;gt;%&lt;/code&gt; as “then”. So, we mutated our new &lt;code&gt;ID&lt;/code&gt; varable to correspond to row number &lt;em&gt;then&lt;/em&gt; we relocated our &lt;code&gt;ID&lt;/code&gt; variable to be before &lt;code&gt;Age&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;div id=&#34;character-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Character Data&lt;/h1&gt;
+&lt;p&gt;Now we will get to know the character variables a little bit better.&lt;/p&gt;
+&lt;p&gt;I learned the following methodology from Matt Dancho’s (&lt;span class=&#34;citation&#34;&gt;@mdancho84&lt;/span&gt;) data science class at &lt;a href=&#34;business.science.io&#34;&gt;business.science.io&lt;/a&gt;. If you are interested in applying R to business problems, I highly recommend you check his classes out.&lt;/p&gt;
+&lt;p&gt;We’re now going to use some more of our &lt;code&gt;dplyr&lt;/code&gt; verbs. First up is &lt;code&gt;select_if&lt;/code&gt;. This makes it easier to select certain types of data. In this case, it will be character data. We can pair it with &lt;code&gt;is.character&lt;/code&gt; and pipe in &lt;code&gt;glimpse&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+  select_if(is.character) %&amp;gt;%
+  glimpse()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped all variables&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Rows: 1,470
+## Columns: 0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you’ve enabled &lt;code&gt;tidylog&lt;/code&gt;, you see that &lt;code&gt;select_if: dropped all variables&lt;/code&gt;. I forgot that the built in version of the &lt;code&gt;Attrition&lt;/code&gt; data had already been factorized. Let’s try again and swap out &lt;code&gt;is.factor&lt;/code&gt; for &lt;code&gt;is.character&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+  select_if(is.factor) %&amp;gt;%
+  glimpse()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 17 variables (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Rows: 1,470
+## Columns: 15
+## $ Attrition                &amp;lt;fct&amp;gt; Yes, No, Yes, No, No, No, No, No, No, No, ...
+## $ BusinessTravel           &amp;lt;fct&amp;gt; Travel_Rarely, Travel_Frequently, Travel_R...
+## $ Department               &amp;lt;fct&amp;gt; Sales, Research_Development, Research_Deve...
+## $ Education                &amp;lt;ord&amp;gt; College, Below_College, College, Master, B...
+## $ EducationField           &amp;lt;fct&amp;gt; Life_Sciences, Life_Sciences, Other, Life_...
+## $ EnvironmentSatisfaction  &amp;lt;ord&amp;gt; Medium, High, Very_High, Very_High, Low, V...
+## $ Gender                   &amp;lt;fct&amp;gt; Female, Male, Male, Female, Male, Male, Fe...
+## $ JobInvolvement           &amp;lt;ord&amp;gt; High, Medium, Medium, High, High, High, Ve...
+## $ JobRole                  &amp;lt;fct&amp;gt; Sales_Executive, Research_Scientist, Labor...
+## $ JobSatisfaction          &amp;lt;ord&amp;gt; Very_High, Medium, High, High, Medium, Ver...
+## $ MaritalStatus            &amp;lt;fct&amp;gt; Single, Married, Single, Married, Married,...
+## $ OverTime                 &amp;lt;fct&amp;gt; Yes, No, Yes, Yes, No, No, Yes, No, No, No...
+## $ PerformanceRating        &amp;lt;ord&amp;gt; Excellent, Outstanding, Excellent, Excelle...
+## $ RelationshipSatisfaction &amp;lt;ord&amp;gt; Low, Very_High, Medium, High, Very_High, H...
+## $ WorkLifeBalance          &amp;lt;ord&amp;gt; Bad, Better, Better, Better, Better, Good,...&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Much better! We can now see more information about the 15 columns it returned.&lt;/p&gt;
+&lt;p&gt;Now let us take a look at the unique variables within each column. We will call up the &lt;code&gt;map&lt;/code&gt; feature from &lt;code&gt;purrr&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(unique) #from purrr&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 17 variables (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Attrition
+## [1] Yes No 
+## Levels: No Yes
+## 
+## $BusinessTravel
+## [1] Travel_Rarely     Travel_Frequently Non-Travel       
+## Levels: Non-Travel Travel_Frequently Travel_Rarely
+## 
+## $Department
+## [1] Sales                Research_Development Human_Resources     
+## Levels: Human_Resources Research_Development Sales
+## 
+## $Education
+## [1] College       Below_College Master        Bachelor      Doctor       
+## Levels: Below_College &amp;lt; College &amp;lt; Bachelor &amp;lt; Master &amp;lt; Doctor
+## 
+## $EducationField
+## [1] Life_Sciences    Other            Medical          Marketing       
+## [5] Technical_Degree Human_Resources 
+## 6 Levels: Human_Resources Life_Sciences Marketing Medical ... Technical_Degree
+## 
+## $EnvironmentSatisfaction
+## [1] Medium    High      Very_High Low      
+## Levels: Low &amp;lt; Medium &amp;lt; High &amp;lt; Very_High
+## 
+## $Gender
+## [1] Female Male  
+## Levels: Female Male
+## 
+## $JobInvolvement
+## [1] High      Medium    Very_High Low      
+## Levels: Low &amp;lt; Medium &amp;lt; High &amp;lt; Very_High
+## 
+## $JobRole
+## [1] Sales_Executive           Research_Scientist       
+## [3] Laboratory_Technician     Manufacturing_Director   
+## [5] Healthcare_Representative Manager                  
+## [7] Sales_Representative      Research_Director        
+## [9] Human_Resources          
+## 9 Levels: Healthcare_Representative Human_Resources ... Sales_Representative
+## 
+## $JobSatisfaction
+## [1] Very_High Medium    High      Low      
+## Levels: Low &amp;lt; Medium &amp;lt; High &amp;lt; Very_High
+## 
+## $MaritalStatus
+## [1] Single   Married  Divorced
+## Levels: Divorced Married Single
+## 
+## $OverTime
+## [1] Yes No 
+## Levels: No Yes
+## 
+## $PerformanceRating
+## [1] Excellent   Outstanding
+## Levels: Low &amp;lt; Good &amp;lt; Excellent &amp;lt; Outstanding
+## 
+## $RelationshipSatisfaction
+## [1] Low       Very_High Medium    High     
+## Levels: Low &amp;lt; Medium &amp;lt; High &amp;lt; Very_High
+## 
+## $WorkLifeBalance
+## [1] Bad    Better Good   Best  
+## Levels: Bad &amp;lt; Good &amp;lt; Better &amp;lt; Best&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Since these are factors, in addition to the unique values, it also gives us the levels. Notice &lt;code&gt;WorkLifeBalance&lt;/code&gt; at the very bottom and the levels of Bad &amp;lt; Good &amp;lt; Better &amp;lt; Best. This is showing that Bad is less than Good which is less than Better and so on. We’ll revisit how to do this in a later post as the data almost never hits your inbox with this information included.&lt;/p&gt;
+&lt;p&gt;Another way to look at the data is to use the &lt;code&gt;table&lt;/code&gt; function. We will swap out &lt;code&gt;unique&lt;/code&gt; for &lt;code&gt;table&lt;/code&gt; within &lt;code&gt;map&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(table)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 17 variables (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Attrition
+## 
+##   No  Yes 
+## 1233  237 
+## 
+## $BusinessTravel
+## 
+##        Non-Travel Travel_Frequently     Travel_Rarely 
+##               150               277              1043 
+## 
+## $Department
+## 
+##      Human_Resources Research_Development                Sales 
+##                   63                  961                  446 
+## 
+## $Education
+## 
+## Below_College       College      Bachelor        Master        Doctor 
+##           170           282           572           398            48 
+## 
+## $EducationField
+## 
+##  Human_Resources    Life_Sciences        Marketing          Medical 
+##               27              606              159              464 
+##            Other Technical_Degree 
+##               82              132 
+## 
+## $EnvironmentSatisfaction
+## 
+##       Low    Medium      High Very_High 
+##       284       287       453       446 
+## 
+## $Gender
+## 
+## Female   Male 
+##    588    882 
+## 
+## $JobInvolvement
+## 
+##       Low    Medium      High Very_High 
+##        83       375       868       144 
+## 
+## $JobRole
+## 
+## Healthcare_Representative           Human_Resources     Laboratory_Technician 
+##                       131                        52                       259 
+##                   Manager    Manufacturing_Director         Research_Director 
+##                       102                       145                        80 
+##        Research_Scientist           Sales_Executive      Sales_Representative 
+##                       292                       326                        83 
+## 
+## $JobSatisfaction
+## 
+##       Low    Medium      High Very_High 
+##       289       280       442       459 
+## 
+## $MaritalStatus
+## 
+## Divorced  Married   Single 
+##      327      673      470 
+## 
+## $OverTime
+## 
+##   No  Yes 
+## 1054  416 
+## 
+## $PerformanceRating
+## 
+##         Low        Good   Excellent Outstanding 
+##           0           0        1244         226 
+## 
+## $RelationshipSatisfaction
+## 
+##       Low    Medium      High Very_High 
+##       276       303       459       432 
+## 
+## $WorkLifeBalance
+## 
+##    Bad   Good Better   Best 
+##     80    344    893    153&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This way of looking at the data is very helpful since you can begin to get a feel for the factors. &lt;code&gt;Performance&lt;/code&gt; rating has 0 for both &lt;code&gt;Low&lt;/code&gt; and &lt;code&gt;Good&lt;/code&gt;. This may be accurate or it may be some faulty data. Seeing this let’s you reach out to whoever would know and either check off on the data or realize a mistake has been made before you go further in your analysis.&lt;/p&gt;
+&lt;p&gt;You can also get proportions if that helps you to understand the data better. I won’t go too much into how this works here, but we may step through this a bit more in a future post if you are interested in doing so.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# To get proportions
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(~ table(.) %&amp;gt;% prop.table()) #anonymous function&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 17 variables (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Attrition
+## .
+##        No       Yes 
+## 0.8387755 0.1612245 
+## 
+## $BusinessTravel
+## .
+##        Non-Travel Travel_Frequently     Travel_Rarely 
+##         0.1020408         0.1884354         0.7095238 
+## 
+## $Department
+## .
+##      Human_Resources Research_Development                Sales 
+##           0.04285714           0.65374150           0.30340136 
+## 
+## $Education
+## .
+## Below_College       College      Bachelor        Master        Doctor 
+##    0.11564626    0.19183673    0.38911565    0.27074830    0.03265306 
+## 
+## $EducationField
+## .
+##  Human_Resources    Life_Sciences        Marketing          Medical 
+##       0.01836735       0.41224490       0.10816327       0.31564626 
+##            Other Technical_Degree 
+##       0.05578231       0.08979592 
+## 
+## $EnvironmentSatisfaction
+## .
+##       Low    Medium      High Very_High 
+## 0.1931973 0.1952381 0.3081633 0.3034014 
+## 
+## $Gender
+## .
+## Female   Male 
+##    0.4    0.6 
+## 
+## $JobInvolvement
+## .
+##        Low     Medium       High  Very_High 
+## 0.05646259 0.25510204 0.59047619 0.09795918 
+## 
+## $JobRole
+## .
+## Healthcare_Representative           Human_Resources     Laboratory_Technician 
+##                0.08911565                0.03537415                0.17619048 
+##                   Manager    Manufacturing_Director         Research_Director 
+##                0.06938776                0.09863946                0.05442177 
+##        Research_Scientist           Sales_Executive      Sales_Representative 
+##                0.19863946                0.22176871                0.05646259 
+## 
+## $JobSatisfaction
+## .
+##       Low    Medium      High Very_High 
+## 0.1965986 0.1904762 0.3006803 0.3122449 
+## 
+## $MaritalStatus
+## .
+##  Divorced   Married    Single 
+## 0.2224490 0.4578231 0.3197279 
+## 
+## $OverTime
+## .
+##        No       Yes 
+## 0.7170068 0.2829932 
+## 
+## $PerformanceRating
+## .
+##         Low        Good   Excellent Outstanding 
+##   0.0000000   0.0000000   0.8462585   0.1537415 
+## 
+## $RelationshipSatisfaction
+## .
+##       Low    Medium      High Very_High 
+## 0.1877551 0.2061224 0.3122449 0.2938776 
+## 
+## $WorkLifeBalance
+## .
+##        Bad       Good     Better       Best 
+## 0.05442177 0.23401361 0.60748299 0.10408163&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This now gives us the proportions, but I struggle with anything more than about 2 or 3 decimals. Let’s go ahead and clean this up a bit. We have wrapped everything in the &lt;code&gt;round&lt;/code&gt; function. Also, notice that I didn’t always know how to do this. I’ve put where I learned how do to this as a URL I’ve commented out from &lt;a href=&#34;stackoverflow.com&#34;&gt;stackoverflow.com&lt;/a&gt;. Remember to leave yourself breadcrumbs to find your way home! You may not need these breadcrumbs tomorrow, but you will thank yourself when you have to come back to your code 6 months or more down the road. I also think the breadcrumbs are helpful if you have to share your code.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(~ round(table(.) %&amp;gt;% prop.table(), 2)) #anonymous function&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 17 variables (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Attrition
+## .
+##   No  Yes 
+## 0.84 0.16 
+## 
+## $BusinessTravel
+## .
+##        Non-Travel Travel_Frequently     Travel_Rarely 
+##              0.10              0.19              0.71 
+## 
+## $Department
+## .
+##      Human_Resources Research_Development                Sales 
+##                 0.04                 0.65                 0.30 
+## 
+## $Education
+## .
+## Below_College       College      Bachelor        Master        Doctor 
+##          0.12          0.19          0.39          0.27          0.03 
+## 
+## $EducationField
+## .
+##  Human_Resources    Life_Sciences        Marketing          Medical 
+##             0.02             0.41             0.11             0.32 
+##            Other Technical_Degree 
+##             0.06             0.09 
+## 
+## $EnvironmentSatisfaction
+## .
+##       Low    Medium      High Very_High 
+##      0.19      0.20      0.31      0.30 
+## 
+## $Gender
+## .
+## Female   Male 
+##    0.4    0.6 
+## 
+## $JobInvolvement
+## .
+##       Low    Medium      High Very_High 
+##      0.06      0.26      0.59      0.10 
+## 
+## $JobRole
+## .
+## Healthcare_Representative           Human_Resources     Laboratory_Technician 
+##                      0.09                      0.04                      0.18 
+##                   Manager    Manufacturing_Director         Research_Director 
+##                      0.07                      0.10                      0.05 
+##        Research_Scientist           Sales_Executive      Sales_Representative 
+##                      0.20                      0.22                      0.06 
+## 
+## $JobSatisfaction
+## .
+##       Low    Medium      High Very_High 
+##      0.20      0.19      0.30      0.31 
+## 
+## $MaritalStatus
+## .
+## Divorced  Married   Single 
+##     0.22     0.46     0.32 
+## 
+## $OverTime
+## .
+##   No  Yes 
+## 0.72 0.28 
+## 
+## $PerformanceRating
+## .
+##         Low        Good   Excellent Outstanding 
+##        0.00        0.00        0.85        0.15 
+## 
+## $RelationshipSatisfaction
+## .
+##       Low    Medium      High Very_High 
+##      0.19      0.21      0.31      0.29 
+## 
+## $WorkLifeBalance
+## .
+##    Bad   Good Better   Best 
+##   0.05   0.23   0.61   0.10&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Rounded to 2 decimal places looks much better to my eye. If 3 looks better to yours, simply swap out the 2 for a 3.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(~ round(table(.) %&amp;gt;% prop.table(), 3)) #anonymous function&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 17 variables (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Attrition
+## .
+##    No   Yes 
+## 0.839 0.161 
+## 
+## $BusinessTravel
+## .
+##        Non-Travel Travel_Frequently     Travel_Rarely 
+##             0.102             0.188             0.710 
+## 
+## $Department
+## .
+##      Human_Resources Research_Development                Sales 
+##                0.043                0.654                0.303 
+## 
+## $Education
+## .
+## Below_College       College      Bachelor        Master        Doctor 
+##         0.116         0.192         0.389         0.271         0.033 
+## 
+## $EducationField
+## .
+##  Human_Resources    Life_Sciences        Marketing          Medical 
+##            0.018            0.412            0.108            0.316 
+##            Other Technical_Degree 
+##            0.056            0.090 
+## 
+## $EnvironmentSatisfaction
+## .
+##       Low    Medium      High Very_High 
+##     0.193     0.195     0.308     0.303 
+## 
+## $Gender
+## .
+## Female   Male 
+##    0.4    0.6 
+## 
+## $JobInvolvement
+## .
+##       Low    Medium      High Very_High 
+##     0.056     0.255     0.590     0.098 
+## 
+## $JobRole
+## .
+## Healthcare_Representative           Human_Resources     Laboratory_Technician 
+##                     0.089                     0.035                     0.176 
+##                   Manager    Manufacturing_Director         Research_Director 
+##                     0.069                     0.099                     0.054 
+##        Research_Scientist           Sales_Executive      Sales_Representative 
+##                     0.199                     0.222                     0.056 
+## 
+## $JobSatisfaction
+## .
+##       Low    Medium      High Very_High 
+##     0.197     0.190     0.301     0.312 
+## 
+## $MaritalStatus
+## .
+## Divorced  Married   Single 
+##    0.222    0.458    0.320 
+## 
+## $OverTime
+## .
+##    No   Yes 
+## 0.717 0.283 
+## 
+## $PerformanceRating
+## .
+##         Low        Good   Excellent Outstanding 
+##       0.000       0.000       0.846       0.154 
+## 
+## $RelationshipSatisfaction
+## .
+##       Low    Medium      High Very_High 
+##     0.188     0.206     0.312     0.294 
+## 
+## $WorkLifeBalance
+## .
+##    Bad   Good Better   Best 
+##  0.054  0.234  0.607  0.104&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Remember, there are also usually multiple ways of doing things in R. We could have accomplished the same thing with the following code. I say choose whichever coding style looks better to you.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(~round(prop.table(table(.x)),2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 17 variables (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Attrition
+## .x
+##   No  Yes 
+## 0.84 0.16 
+## 
+## $BusinessTravel
+## .x
+##        Non-Travel Travel_Frequently     Travel_Rarely 
+##              0.10              0.19              0.71 
+## 
+## $Department
+## .x
+##      Human_Resources Research_Development                Sales 
+##                 0.04                 0.65                 0.30 
+## 
+## $Education
+## .x
+## Below_College       College      Bachelor        Master        Doctor 
+##          0.12          0.19          0.39          0.27          0.03 
+## 
+## $EducationField
+## .x
+##  Human_Resources    Life_Sciences        Marketing          Medical 
+##             0.02             0.41             0.11             0.32 
+##            Other Technical_Degree 
+##             0.06             0.09 
+## 
+## $EnvironmentSatisfaction
+## .x
+##       Low    Medium      High Very_High 
+##      0.19      0.20      0.31      0.30 
+## 
+## $Gender
+## .x
+## Female   Male 
+##    0.4    0.6 
+## 
+## $JobInvolvement
+## .x
+##       Low    Medium      High Very_High 
+##      0.06      0.26      0.59      0.10 
+## 
+## $JobRole
+## .x
+## Healthcare_Representative           Human_Resources     Laboratory_Technician 
+##                      0.09                      0.04                      0.18 
+##                   Manager    Manufacturing_Director         Research_Director 
+##                      0.07                      0.10                      0.05 
+##        Research_Scientist           Sales_Executive      Sales_Representative 
+##                      0.20                      0.22                      0.06 
+## 
+## $JobSatisfaction
+## .x
+##       Low    Medium      High Very_High 
+##      0.20      0.19      0.30      0.31 
+## 
+## $MaritalStatus
+## .x
+## Divorced  Married   Single 
+##     0.22     0.46     0.32 
+## 
+## $OverTime
+## .x
+##   No  Yes 
+## 0.72 0.28 
+## 
+## $PerformanceRating
+## .x
+##         Low        Good   Excellent Outstanding 
+##        0.00        0.00        0.85        0.15 
+## 
+## $RelationshipSatisfaction
+## .x
+##       Low    Medium      High Very_High 
+##      0.19      0.21      0.31      0.29 
+## 
+## $WorkLifeBalance
+## .x
+##    Bad   Good Better   Best 
+##   0.05   0.23   0.61   0.10&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We could have also utilized the &lt;code&gt;tabyl&lt;/code&gt; function from &lt;code&gt;janitor&lt;/code&gt;, but now I’m going down a bit of a rabbit hole. The point is, mess around with the code and the data. Make it your own.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(tabyl)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 17 variables (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Attrition
+##  .x[[i]]    n   percent
+##       No 1233 0.8387755
+##      Yes  237 0.1612245
+## 
+## $BusinessTravel
+##            .x[[i]]    n   percent
+##         Non-Travel  150 0.1020408
+##  Travel_Frequently  277 0.1884354
+##      Travel_Rarely 1043 0.7095238
+## 
+## $Department
+##               .x[[i]]   n    percent
+##       Human_Resources  63 0.04285714
+##  Research_Development 961 0.65374150
+##                 Sales 446 0.30340136
+## 
+## $Education
+##        .x[[i]]   n    percent
+##  Below_College 170 0.11564626
+##        College 282 0.19183673
+##       Bachelor 572 0.38911565
+##         Master 398 0.27074830
+##         Doctor  48 0.03265306
+## 
+## $EducationField
+##           .x[[i]]   n    percent
+##   Human_Resources  27 0.01836735
+##     Life_Sciences 606 0.41224490
+##         Marketing 159 0.10816327
+##           Medical 464 0.31564626
+##             Other  82 0.05578231
+##  Technical_Degree 132 0.08979592
+## 
+## $EnvironmentSatisfaction
+##    .x[[i]]   n   percent
+##        Low 284 0.1931973
+##     Medium 287 0.1952381
+##       High 453 0.3081633
+##  Very_High 446 0.3034014
+## 
+## $Gender
+##  .x[[i]]   n percent
+##   Female 588     0.4
+##     Male 882     0.6
+## 
+## $JobInvolvement
+##    .x[[i]]   n    percent
+##        Low  83 0.05646259
+##     Medium 375 0.25510204
+##       High 868 0.59047619
+##  Very_High 144 0.09795918
+## 
+## $JobRole
+##                    .x[[i]]   n    percent
+##  Healthcare_Representative 131 0.08911565
+##            Human_Resources  52 0.03537415
+##      Laboratory_Technician 259 0.17619048
+##                    Manager 102 0.06938776
+##     Manufacturing_Director 145 0.09863946
+##          Research_Director  80 0.05442177
+##         Research_Scientist 292 0.19863946
+##            Sales_Executive 326 0.22176871
+##       Sales_Representative  83 0.05646259
+## 
+## $JobSatisfaction
+##    .x[[i]]   n   percent
+##        Low 289 0.1965986
+##     Medium 280 0.1904762
+##       High 442 0.3006803
+##  Very_High 459 0.3122449
+## 
+## $MaritalStatus
+##   .x[[i]]   n   percent
+##  Divorced 327 0.2224490
+##   Married 673 0.4578231
+##    Single 470 0.3197279
+## 
+## $OverTime
+##  .x[[i]]    n   percent
+##       No 1054 0.7170068
+##      Yes  416 0.2829932
+## 
+## $PerformanceRating
+##      .x[[i]]    n   percent
+##          Low    0 0.0000000
+##         Good    0 0.0000000
+##    Excellent 1244 0.8462585
+##  Outstanding  226 0.1537415
+## 
+## $RelationshipSatisfaction
+##    .x[[i]]   n   percent
+##        Low 276 0.1877551
+##     Medium 303 0.2061224
+##       High 459 0.3122449
+##  Very_High 432 0.2938776
+## 
+## $WorkLifeBalance
+##  .x[[i]]   n    percent
+##      Bad  80 0.05442177
+##     Good 344 0.23401361
+##   Better 893 0.60748299
+##     Best 153 0.10408163&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(tabyl)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 17 variables (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Attrition
+##  .x[[i]]    n   percent
+##       No 1233 0.8387755
+##      Yes  237 0.1612245
+## 
+## $BusinessTravel
+##            .x[[i]]    n   percent
+##         Non-Travel  150 0.1020408
+##  Travel_Frequently  277 0.1884354
+##      Travel_Rarely 1043 0.7095238
+## 
+## $Department
+##               .x[[i]]   n    percent
+##       Human_Resources  63 0.04285714
+##  Research_Development 961 0.65374150
+##                 Sales 446 0.30340136
+## 
+## $Education
+##        .x[[i]]   n    percent
+##  Below_College 170 0.11564626
+##        College 282 0.19183673
+##       Bachelor 572 0.38911565
+##         Master 398 0.27074830
+##         Doctor  48 0.03265306
+## 
+## $EducationField
+##           .x[[i]]   n    percent
+##   Human_Resources  27 0.01836735
+##     Life_Sciences 606 0.41224490
+##         Marketing 159 0.10816327
+##           Medical 464 0.31564626
+##             Other  82 0.05578231
+##  Technical_Degree 132 0.08979592
+## 
+## $EnvironmentSatisfaction
+##    .x[[i]]   n   percent
+##        Low 284 0.1931973
+##     Medium 287 0.1952381
+##       High 453 0.3081633
+##  Very_High 446 0.3034014
+## 
+## $Gender
+##  .x[[i]]   n percent
+##   Female 588     0.4
+##     Male 882     0.6
+## 
+## $JobInvolvement
+##    .x[[i]]   n    percent
+##        Low  83 0.05646259
+##     Medium 375 0.25510204
+##       High 868 0.59047619
+##  Very_High 144 0.09795918
+## 
+## $JobRole
+##                    .x[[i]]   n    percent
+##  Healthcare_Representative 131 0.08911565
+##            Human_Resources  52 0.03537415
+##      Laboratory_Technician 259 0.17619048
+##                    Manager 102 0.06938776
+##     Manufacturing_Director 145 0.09863946
+##          Research_Director  80 0.05442177
+##         Research_Scientist 292 0.19863946
+##            Sales_Executive 326 0.22176871
+##       Sales_Representative  83 0.05646259
+## 
+## $JobSatisfaction
+##    .x[[i]]   n   percent
+##        Low 289 0.1965986
+##     Medium 280 0.1904762
+##       High 442 0.3006803
+##  Very_High 459 0.3122449
+## 
+## $MaritalStatus
+##   .x[[i]]   n   percent
+##  Divorced 327 0.2224490
+##   Married 673 0.4578231
+##    Single 470 0.3197279
+## 
+## $OverTime
+##  .x[[i]]    n   percent
+##       No 1054 0.7170068
+##      Yes  416 0.2829932
+## 
+## $PerformanceRating
+##      .x[[i]]    n   percent
+##          Low    0 0.0000000
+##         Good    0 0.0000000
+##    Excellent 1244 0.8462585
+##  Outstanding  226 0.1537415
+## 
+## $RelationshipSatisfaction
+##    .x[[i]]   n   percent
+##        Low 276 0.1877551
+##     Medium 303 0.2061224
+##       High 459 0.3122449
+##  Very_High 432 0.2938776
+## 
+## $WorkLifeBalance
+##  .x[[i]]   n    percent
+##      Bad  80 0.05442177
+##     Good 344 0.23401361
+##   Better 893 0.60748299
+##     Best 153 0.10408163&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Data %&amp;gt;%
+#     select_if(is.factor) %&amp;gt;%
+#     map(~ round(table(.) %&amp;gt;% prop.table(), 3)) #anonymous function&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;numeric-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Numeric Data&lt;/h1&gt;
+&lt;p&gt;I also enjoy Matt Dancho’s way of looking at numeric data so I wanted to include this. The code below should look pretty familiar. We are just swapping out &lt;code&gt;is.numeric&lt;/code&gt; for &lt;code&gt;is.factor&lt;/code&gt;. Adding &lt;code&gt;length&lt;/code&gt; simply tells us how many unique values are in each numeric variable. So, as expected, we see 1470 for &lt;code&gt;ID&lt;/code&gt; which makes sense because we have 1470 rows.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map(~ unique(.) %&amp;gt;% length())&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 15 variables (Attrition, BusinessTravel, Department, Education, EducationField, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $ID
+## [1] 1470
+## 
+## $Age
+## [1] 43
+## 
+## $DailyRate
+## [1] 886
+## 
+## $DistanceFromHome
+## [1] 29
+## 
+## $HourlyRate
+## [1] 71
+## 
+## $JobLevel
+## [1] 5
+## 
+## $MonthlyIncome
+## [1] 1349
+## 
+## $MonthlyRate
+## [1] 1427
+## 
+## $NumCompaniesWorked
+## [1] 10
+## 
+## $PercentSalaryHike
+## [1] 15
+## 
+## $StockOptionLevel
+## [1] 4
+## 
+## $TotalWorkingYears
+## [1] 40
+## 
+## $TrainingTimesLastYear
+## [1] 7
+## 
+## $YearsAtCompany
+## [1] 37
+## 
+## $YearsInCurrentRole
+## [1] 19
+## 
+## $YearsSinceLastPromotion
+## [1] 16
+## 
+## $YearsWithCurrManager
+## [1] 18&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Changing out &lt;code&gt;map&lt;/code&gt; for &lt;code&gt;map_df&lt;/code&gt; will turn this into a data frame. That makes it easier to export the file to something like Excel.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) # tries to turn it into a df instead of a list&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 15 variables (Attrition, BusinessTravel, Department, Education, EducationField, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 1 x 17
+##      ID   Age DailyRate DistanceFromHome HourlyRate JobLevel MonthlyIncome
+##   &amp;lt;int&amp;gt; &amp;lt;int&amp;gt;     &amp;lt;int&amp;gt;            &amp;lt;int&amp;gt;      &amp;lt;int&amp;gt;    &amp;lt;int&amp;gt;         &amp;lt;int&amp;gt;
+## 1  1470    43       886               29         71        5          1349
+## # ... with 10 more variables: MonthlyRate &amp;lt;int&amp;gt;, NumCompaniesWorked &amp;lt;int&amp;gt;,
+## #   PercentSalaryHike &amp;lt;int&amp;gt;, StockOptionLevel &amp;lt;int&amp;gt;, TotalWorkingYears &amp;lt;int&amp;gt;,
+## #   TrainingTimesLastYear &amp;lt;int&amp;gt;, YearsAtCompany &amp;lt;int&amp;gt;,
+## #   YearsInCurrentRole &amp;lt;int&amp;gt;, YearsSinceLastPromotion &amp;lt;int&amp;gt;,
+## #   YearsWithCurrManager &amp;lt;int&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Throwing &lt;code&gt;gather&lt;/code&gt; after the pipe will make the data tall or pivot it.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 15 variables (Attrition, BusinessTravel, Department, Education, EducationField, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## gather: reorganized (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …) into (key, value) [was 1x17, now 17x2]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 17 x 2
+##    key                     value
+##    &amp;lt;chr&amp;gt;                   &amp;lt;int&amp;gt;
+##  1 ID                       1470
+##  2 Age                        43
+##  3 DailyRate                 886
+##  4 DistanceFromHome           29
+##  5 HourlyRate                 71
+##  6 JobLevel                    5
+##  7 MonthlyIncome            1349
+##  8 MonthlyRate              1427
+##  9 NumCompaniesWorked         10
+## 10 PercentSalaryHike          15
+## 11 StockOptionLevel            4
+## 12 TotalWorkingYears          40
+## 13 TrainingTimesLastYear       7
+## 14 YearsAtCompany             37
+## 15 YearsInCurrentRole         19
+## 16 YearsSinceLastPromotion    16
+## 17 YearsWithCurrManager       18&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can pipe in &lt;code&gt;arrange&lt;/code&gt; and set it to &lt;code&gt;desc&lt;/code&gt; for descending to get the values from most to least.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather() %&amp;gt;%
+    arrange(desc(value)) # Move the largest value to the top and go descending &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 15 variables (Attrition, BusinessTravel, Department, Education, EducationField, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## gather: reorganized (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …) into (key, value) [was 1x17, now 17x2]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 17 x 2
+##    key                     value
+##    &amp;lt;chr&amp;gt;                   &amp;lt;int&amp;gt;
+##  1 ID                       1470
+##  2 MonthlyRate              1427
+##  3 MonthlyIncome            1349
+##  4 DailyRate                 886
+##  5 HourlyRate                 71
+##  6 Age                        43
+##  7 TotalWorkingYears          40
+##  8 YearsAtCompany             37
+##  9 DistanceFromHome           29
+## 10 YearsInCurrentRole         19
+## 11 YearsWithCurrManager       18
+## 12 YearsSinceLastPromotion    16
+## 13 PercentSalaryHike          15
+## 14 NumCompaniesWorked         10
+## 15 TrainingTimesLastYear       7
+## 16 JobLevel                    5
+## 17 StockOptionLevel            4&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now it would be super easy to save it as a new object like &lt;code&gt;Values_for_Excel&lt;/code&gt; or something like that to export with &lt;code&gt;openxlsx::write.xlsx&lt;/code&gt;. We’ll cover that more in a later post.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Values_for_Excel &amp;lt;- Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather() %&amp;gt;%
+    arrange(desc(value)) # Move the largest value to the top and go descending &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 15 variables (Attrition, BusinessTravel, Department, Education, EducationField, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## gather: reorganized (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …) into (key, value) [was 1x17, now 17x2]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;Values_for_Excel&lt;/code&gt; now appears as a new df in your Global Environment.&lt;/p&gt;
+&lt;p&gt;A neat trick I learned from Matt Dancho’s class is the following for determining if a numeric variables is more likely continuous or discrete.&lt;/p&gt;
+&lt;p&gt;Values higher than 10 are probably continuous. &lt;code&gt;PercenetSalaryHike&lt;/code&gt;, &lt;code&gt;YearsSinceLastPromotion&lt;/code&gt;, etc.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather() %&amp;gt;%
+    arrange(value) %&amp;gt;%
+    filter(value &amp;gt; 10) #probably continuous if more than 10&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 15 variables (Attrition, BusinessTravel, Department, Education, EducationField, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## gather: reorganized (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …) into (key, value) [was 1x17, now 17x2]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 13 x 2
+##    key                     value
+##    &amp;lt;chr&amp;gt;                   &amp;lt;int&amp;gt;
+##  1 PercentSalaryHike          15
+##  2 YearsSinceLastPromotion    16
+##  3 YearsWithCurrManager       18
+##  4 YearsInCurrentRole         19
+##  5 DistanceFromHome           29
+##  6 YearsAtCompany             37
+##  7 TotalWorkingYears          40
+##  8 Age                        43
+##  9 HourlyRate                 71
+## 10 DailyRate                 886
+## 11 MonthlyIncome            1349
+## 12 MonthlyRate              1427
+## 13 ID                       1470&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Values less than 10 are probably discrete. &lt;code&gt;JobLevel&lt;/code&gt;, &lt;code&gt;NumCompaniesWorked&lt;/code&gt;, etc.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather() %&amp;gt;%
+    arrange(value) %&amp;gt;%
+    filter(value &amp;lt;= 10) #probably discrete if less than 10&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## select_if: dropped 15 variables (Attrition, BusinessTravel, Department, Education, EducationField, …)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## gather: reorganized (ID, Age, DailyRate, DistanceFromHome, HourlyRate, …) into (key, value) [was 1x17, now 17x2]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 4 x 2
+##   key                   value
+##   &amp;lt;chr&amp;gt;                 &amp;lt;int&amp;gt;
+## 1 StockOptionLevel          4
+## 2 JobLevel                  5
+## 3 TrainingTimesLastYear     7
+## 4 NumCompaniesWorked       10&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You may need to change 10 to be a little lower or higher to differentiate your specific data, but it is a great place to start.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;wrap-up&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Wrap up&lt;/h1&gt;
+&lt;p&gt;That is it for now. Hopefully you have found something you can use here. Keep coming back as we will start to visualize the data and add to it as we try to make it more and more like something you will encounter in your work place.&lt;/p&gt;
+&lt;/div&gt;
 </description>
     </item>
     
