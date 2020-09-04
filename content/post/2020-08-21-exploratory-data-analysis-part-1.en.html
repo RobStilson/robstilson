@@ -1187,7 +1187,7 @@ Data &lt;- read_excel(&quot;D:/Folder where the file is located/WA_Fn-UseC_-HR-E
 <div id="character-data" class="section level1">
 <h1>Character Data</h1>
 <p>Now we will get to know the character variables a little bit better.</p>
-<p>I learned the following methodology from Matt Dancho’s (<span class="citation">@mdancho84</span>) data science class at <a href="https://www.business-science.io/">https://www.business-science.io/</a>. If you are interested in applying R to business problems, I highly recommend you check his classes out.</p>
+<p>I learned the following methodology from Matt Dancho’s (<span class="citation">@mdancho84</span>) data science class at <a href="https://www.business-science.io/">business-science.io</a>. If you are interested in applying R to business problems, I highly recommend you check his classes out.</p>
 <p>We’re now going to use some more of our <code>dplyr</code> verbs. First up is <code>select_if</code>. This makes it easier to select certain types of data. In this case, it will be character data. We can pair it with <code>is.character</code> and pipe in <code>glimpse</code>.</p>
 <pre class="r"><code>Data %&gt;%
   select_if(is.character) %&gt;%
