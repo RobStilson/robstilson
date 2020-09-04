@@ -19,6 +19,32 @@
       <guid>http://robstilson.rbind.io/post/exploratory-data-analysis-part-1/</guid>
       <description>
 
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#get-packages&#34;&gt;Get Packages&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#load-packages&#34;&gt;Load packages&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#bring-in-the-data&#34;&gt;Bring in the data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#load-data-from-excel&#34;&gt;Load data from Excel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#head&#34;&gt;Head&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#tail&#34;&gt;Tail&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#headtail&#34;&gt;HeadTail&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#dimensions-of-the-data&#34;&gt;Dimensions of the data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#structure-of-the-data&#34;&gt;Structure of the data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#glimpse-the-data&#34;&gt;Glimpse the data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#skim-the-data&#34;&gt;Skim the data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#describe-the-data&#34;&gt;Describe the data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#save-describe-as-a-df&#34;&gt;Save &lt;code&gt;describe&lt;/code&gt; as a DF&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#round-describe-and-save-as-a-df&#34;&gt;Round &lt;code&gt;describe&lt;/code&gt; and save as a DF&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#write-to-excel&#34;&gt;Write to Excel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#add-an-id-column&#34;&gt;Add an ID column&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#character-data&#34;&gt;Character Data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#numeric-data&#34;&gt;Numeric Data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#wrap-up&#34;&gt;Wrap up&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#just-the-code&#34;&gt;Just the code&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
 
 &lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Summary&lt;/h1&gt;
@@ -2093,6 +2119,176 @@ Data %&amp;gt;%
 &lt;div id=&#34;wrap-up&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Wrap up&lt;/h1&gt;
 &lt;p&gt;That is it for now. Hopefully you have found something you can use here. Keep coming back as we will start to visualize the data and add to it as we try to make it more and more like something you will encounter in your work place.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;just-the-code&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Just the code&lt;/h1&gt;
+&lt;p&gt;Thanks to &lt;a href=&#34;https://yihui.org/&#34;&gt;Yihui Xie&lt;/a&gt; and &lt;a href=&#34;https://www.lucymcgowan.com/&#34;&gt;Lucy D’Agostino&lt;/a&gt;, I stumbled across this bit of &lt;a href=&#34;https://yihui.org/en/2018/09/code-appendix/&#34;&gt;sorcery&lt;/a&gt; using &lt;code&gt;PURL&lt;/code&gt; where you simply include an &lt;code&gt;R&lt;/code&gt; code chunk to save all of the above code in the appendix.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#&amp;#39; &amp;lt;!-- ####################################################################################################### --&amp;gt;
+#&amp;#39; &amp;lt;!-- ####################################################################################################### --&amp;gt;
+#&amp;#39; &amp;lt;!-- ##################################LOADING PACKAGES##################################################### --&amp;gt;
+
+tryCatch(require(pacman),finally=utils:::install.packages(pkgs=&amp;#39;pacman&amp;#39;,repos=&amp;#39;http://cran.r-project.org&amp;#39;));
+require(pacman)
+
+# if the above doesn&amp;#39;t work, use this code#
+# tryCatch
+# detach(&amp;quot;package:pacman&amp;quot;, unload = TRUE)
+# install.packages(&amp;quot;pacman&amp;quot;, dependencies = TRUE)
+# install.packages(&amp;quot;pacman&amp;quot;)
+
+pacman::p_load(modeldata, # data sets useful for modeling packages
+               dplyr, # a grammar of data manipulation
+               tidyr, # tidy messy data
+               readxl, # read Excel files
+               ggplot2, # create elegant data visualisations using the grammar of graphics
+               knitr, # a general-purpose package for dynamic report generation in R
+               broom, # convert statistical objects into tidy tibbles
+               purrr, # functional programming tools
+               psych, #procedures for psychological, psychometric, and personality research
+               conflicted, # an alternative conflict resolution strategy for like named function in different libraries
+               janitor, # simple tools for examining and cleaning dirty data
+               skimr, # compact and flexible summaries of data
+               openxlsx, # read write and edit xlsx files
+               tidyquant, # tidy quantitative financial analysis
+               tidylog # logging for `dplyr` and `tidyr` functions
+)
+
+
+#&amp;#39; &amp;lt;!-- #Loading libraries --&amp;gt;
+
+suppressPackageStartupMessages({
+  library(modeldata)      
+  library(dplyr)
+  library(tidyr)
+  library(readxl)
+  library(ggplot2)
+  library(knitr)
+  library(broom)
+  library(purrr)
+  library(psych)
+  library(conflicted)
+  library(janitor)
+  library(skimr)
+  library(openxlsx)
+  library(tidyquant)
+  library(tidylog, warn.conflicts = FALSE)
+})
+
+for (f in getNamespaceExports(&amp;quot;tidylog&amp;quot;)) {
+    conflicted::conflict_prefer(f, &amp;quot;tidylog&amp;quot;, quiet = TRUE)
+}
+
+conflict_prefer(&amp;quot;filter&amp;quot;, &amp;quot;dplyr&amp;quot;)
+library(modeldata)
+
+data(attrition)
+
+Data &amp;lt;- attrition
+library(readxl)
+Data &amp;lt;- read_excel(&amp;quot;D:/Folder where the file is located/WA_Fn-UseC_-HR-Employee-Attrition.xlsx&amp;quot;)
+head(Data)
+head(Data, n = 10)
+tail(Data)
+headTail(Data)
+psych::headTail(Data)
+dim(Data)
+str(Data)
+glimpse(Data)
+skim(Data)
+describe(Data)
+Desc_Data &amp;lt;- as.data.frame(describe(Data))
+Desc_Data &amp;lt;- round(as.data.frame(describe(Data)),3)
+openxlsx::write.xlsx(Desc_Data, &amp;quot;00_Data/Descriptive Statistics for Data.xlsx&amp;quot;)
+TEST &amp;lt;- Data %&amp;gt;%
+  mutate(ID = row_number())
+head(TEST)
+TEST &amp;lt;- TEST %&amp;gt;%
+  select(ID, everything())
+
+head(TEST)
+TEST &amp;lt;- TEST %&amp;gt;%
+  relocate(ID, .before = Age)
+
+head(TEST)
+Data &amp;lt;- Data %&amp;gt;% 
+    mutate(ID = row_number()) %&amp;gt;%
+  relocate(ID, .before = Age)
+
+head(Data)
+Data %&amp;gt;%
+  select_if(is.character) %&amp;gt;%
+  glimpse()
+Data %&amp;gt;%
+  select_if(is.factor) %&amp;gt;%
+  glimpse()
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(unique) #from purrr
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(table)
+# To get proportions
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(~ table(.) %&amp;gt;% prop.table()) #anonymous function
+# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(~ round(table(.) %&amp;gt;% prop.table(), 2)) #anonymous function
+# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(~ round(table(.) %&amp;gt;% prop.table(), 3)) #anonymous function
+# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(~round(prop.table(table(.x)),2))
+          
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(tabyl)
+Data %&amp;gt;%
+    select_if(is.factor) %&amp;gt;%
+    map(tabyl)
+
+# Data %&amp;gt;%
+#     select_if(is.factor) %&amp;gt;%
+#     map(~ round(table(.) %&amp;gt;% prop.table(), 3)) #anonymous function
+Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map(~ unique(.) %&amp;gt;% length())
+Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) # tries to turn it into a df instead of a list
+Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather()
+Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather() %&amp;gt;%
+    arrange(desc(value)) # Move the largest value to the top and go descending 
+Values_for_Excel &amp;lt;- Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather() %&amp;gt;%
+    arrange(desc(value)) # Move the largest value to the top and go descending 
+Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather() %&amp;gt;%
+    arrange(value) %&amp;gt;%
+    filter(value &amp;gt; 10) #probably continuous if more than 10
+Data %&amp;gt;%
+    select_if(is.numeric) %&amp;gt;%
+    map_df(~ unique(.) %&amp;gt;% length()) %&amp;gt;% # tries to turn it into a df instead of a list
+    gather() %&amp;gt;%
+    arrange(value) %&amp;gt;%
+    filter(value &amp;lt;= 10) #probably discrete if less than 10&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 </description>
     </item>

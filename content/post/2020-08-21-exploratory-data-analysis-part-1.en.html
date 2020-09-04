@@ -16,9 +16,38 @@ image:
   focal_point: ''
   preview_only: no
 projects: []
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 
+<div id="TOC">
+<ul>
+<li><a href="#summary">Summary</a><ul>
+<li><a href="#get-packages">Get Packages</a></li>
+<li><a href="#load-packages">Load packages</a></li>
+<li><a href="#bring-in-the-data">Bring in the data</a></li>
+<li><a href="#load-data-from-excel">Load data from Excel</a></li>
+<li><a href="#head">Head</a></li>
+<li><a href="#tail">Tail</a></li>
+<li><a href="#headtail">HeadTail</a></li>
+<li><a href="#dimensions-of-the-data">Dimensions of the data</a></li>
+<li><a href="#structure-of-the-data">Structure of the data</a></li>
+<li><a href="#glimpse-the-data">Glimpse the data</a></li>
+<li><a href="#skim-the-data">Skim the data</a></li>
+<li><a href="#describe-the-data">Describe the data</a></li>
+<li><a href="#save-describe-as-a-df">Save <code>describe</code> as a DF</a></li>
+<li><a href="#round-describe-and-save-as-a-df">Round <code>describe</code> and save as a DF</a></li>
+<li><a href="#write-to-excel">Write to Excel</a></li>
+<li><a href="#add-an-id-column">Add an ID column</a></li>
+</ul></li>
+<li><a href="#character-data">Character Data</a></li>
+<li><a href="#numeric-data">Numeric Data</a></li>
+<li><a href="#wrap-up">Wrap up</a></li>
+<li><a href="#just-the-code">Just the code</a></li>
+</ul>
+</div>
 
 <div id="summary" class="section level1">
 <h1>Summary</h1>
@@ -2093,4 +2122,174 @@ Data %&gt;%
 <div id="wrap-up" class="section level1">
 <h1>Wrap up</h1>
 <p>That is it for now. Hopefully you have found something you can use here. Keep coming back as we will start to visualize the data and add to it as we try to make it more and more like something you will encounter in your work place.</p>
+</div>
+<div id="just-the-code" class="section level1">
+<h1>Just the code</h1>
+<p>Thanks to <a href="https://yihui.org/">Yihui Xie</a> and <a href="https://www.lucymcgowan.com/">Lucy D’Agostino</a>, I stumbled across this bit of <a href="https://yihui.org/en/2018/09/code-appendix/">sorcery</a> using <code>PURL</code> where you simply include an <code>R</code> code chunk to save all of the above code in the appendix.</p>
+<pre class="r"><code>#&#39; &lt;!-- ####################################################################################################### --&gt;
+#&#39; &lt;!-- ####################################################################################################### --&gt;
+#&#39; &lt;!-- ##################################LOADING PACKAGES##################################################### --&gt;
+
+tryCatch(require(pacman),finally=utils:::install.packages(pkgs=&#39;pacman&#39;,repos=&#39;http://cran.r-project.org&#39;));
+require(pacman)
+
+# if the above doesn&#39;t work, use this code#
+# tryCatch
+# detach(&quot;package:pacman&quot;, unload = TRUE)
+# install.packages(&quot;pacman&quot;, dependencies = TRUE)
+# install.packages(&quot;pacman&quot;)
+
+pacman::p_load(modeldata, # data sets useful for modeling packages
+               dplyr, # a grammar of data manipulation
+               tidyr, # tidy messy data
+               readxl, # read Excel files
+               ggplot2, # create elegant data visualisations using the grammar of graphics
+               knitr, # a general-purpose package for dynamic report generation in R
+               broom, # convert statistical objects into tidy tibbles
+               purrr, # functional programming tools
+               psych, #procedures for psychological, psychometric, and personality research
+               conflicted, # an alternative conflict resolution strategy for like named function in different libraries
+               janitor, # simple tools for examining and cleaning dirty data
+               skimr, # compact and flexible summaries of data
+               openxlsx, # read write and edit xlsx files
+               tidyquant, # tidy quantitative financial analysis
+               tidylog # logging for `dplyr` and `tidyr` functions
+)
+
+
+#&#39; &lt;!-- #Loading libraries --&gt;
+
+suppressPackageStartupMessages({
+  library(modeldata)      
+  library(dplyr)
+  library(tidyr)
+  library(readxl)
+  library(ggplot2)
+  library(knitr)
+  library(broom)
+  library(purrr)
+  library(psych)
+  library(conflicted)
+  library(janitor)
+  library(skimr)
+  library(openxlsx)
+  library(tidyquant)
+  library(tidylog, warn.conflicts = FALSE)
+})
+
+for (f in getNamespaceExports(&quot;tidylog&quot;)) {
+    conflicted::conflict_prefer(f, &quot;tidylog&quot;, quiet = TRUE)
+}
+
+conflict_prefer(&quot;filter&quot;, &quot;dplyr&quot;)
+library(modeldata)
+
+data(attrition)
+
+Data &lt;- attrition
+library(readxl)
+Data &lt;- read_excel(&quot;D:/Folder where the file is located/WA_Fn-UseC_-HR-Employee-Attrition.xlsx&quot;)
+head(Data)
+head(Data, n = 10)
+tail(Data)
+headTail(Data)
+psych::headTail(Data)
+dim(Data)
+str(Data)
+glimpse(Data)
+skim(Data)
+describe(Data)
+Desc_Data &lt;- as.data.frame(describe(Data))
+Desc_Data &lt;- round(as.data.frame(describe(Data)),3)
+openxlsx::write.xlsx(Desc_Data, &quot;00_Data/Descriptive Statistics for Data.xlsx&quot;)
+TEST &lt;- Data %&gt;%
+  mutate(ID = row_number())
+head(TEST)
+TEST &lt;- TEST %&gt;%
+  select(ID, everything())
+
+head(TEST)
+TEST &lt;- TEST %&gt;%
+  relocate(ID, .before = Age)
+
+head(TEST)
+Data &lt;- Data %&gt;% 
+    mutate(ID = row_number()) %&gt;%
+  relocate(ID, .before = Age)
+
+head(Data)
+Data %&gt;%
+  select_if(is.character) %&gt;%
+  glimpse()
+Data %&gt;%
+  select_if(is.factor) %&gt;%
+  glimpse()
+Data %&gt;%
+    select_if(is.factor) %&gt;%
+    map(unique) #from purrr
+Data %&gt;%
+    select_if(is.factor) %&gt;%
+    map(table)
+# To get proportions
+Data %&gt;%
+    select_if(is.factor) %&gt;%
+    map(~ table(.) %&gt;% prop.table()) #anonymous function
+# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %&gt;%
+    select_if(is.factor) %&gt;%
+    map(~ round(table(.) %&gt;% prop.table(), 2)) #anonymous function
+# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %&gt;%
+    select_if(is.factor) %&gt;%
+    map(~ round(table(.) %&gt;% prop.table(), 3)) #anonymous function
+# To get proportions
+# Rounded (From: https://stackoverflow.com/questions/43013016/how-to-create-multiple-frequency-tables-with-percentages-across-factor-variables)
+Data %&gt;%
+    select_if(is.factor) %&gt;%
+    map(~round(prop.table(table(.x)),2))
+          
+Data %&gt;%
+    select_if(is.factor) %&gt;%
+    map(tabyl)
+Data %&gt;%
+    select_if(is.factor) %&gt;%
+    map(tabyl)
+
+# Data %&gt;%
+#     select_if(is.factor) %&gt;%
+#     map(~ round(table(.) %&gt;% prop.table(), 3)) #anonymous function
+Data %&gt;%
+    select_if(is.numeric) %&gt;%
+    map(~ unique(.) %&gt;% length())
+Data %&gt;%
+    select_if(is.numeric) %&gt;%
+    map_df(~ unique(.) %&gt;% length()) # tries to turn it into a df instead of a list
+Data %&gt;%
+    select_if(is.numeric) %&gt;%
+    map_df(~ unique(.) %&gt;% length()) %&gt;% # tries to turn it into a df instead of a list
+    gather()
+Data %&gt;%
+    select_if(is.numeric) %&gt;%
+    map_df(~ unique(.) %&gt;% length()) %&gt;% # tries to turn it into a df instead of a list
+    gather() %&gt;%
+    arrange(desc(value)) # Move the largest value to the top and go descending 
+Values_for_Excel &lt;- Data %&gt;%
+    select_if(is.numeric) %&gt;%
+    map_df(~ unique(.) %&gt;% length()) %&gt;% # tries to turn it into a df instead of a list
+    gather() %&gt;%
+    arrange(desc(value)) # Move the largest value to the top and go descending 
+Data %&gt;%
+    select_if(is.numeric) %&gt;%
+    map_df(~ unique(.) %&gt;% length()) %&gt;% # tries to turn it into a df instead of a list
+    gather() %&gt;%
+    arrange(value) %&gt;%
+    filter(value &gt; 10) #probably continuous if more than 10
+Data %&gt;%
+    select_if(is.numeric) %&gt;%
+    map_df(~ unique(.) %&gt;% length()) %&gt;% # tries to turn it into a df instead of a list
+    gather() %&gt;%
+    arrange(value) %&gt;%
+    filter(value &lt;= 10) #probably discrete if less than 10</code></pre>
 </div>

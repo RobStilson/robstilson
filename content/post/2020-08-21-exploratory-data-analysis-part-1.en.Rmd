@@ -16,6 +16,9 @@ image:
   focal_point: ''
   preview_only: no
 projects: []
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 # Summary
@@ -376,7 +379,6 @@ Data %>%
 ```
 
 ```{r}
-
 Data %>%
     select_if(is.factor) %>%
     map(tabyl)
@@ -462,3 +464,11 @@ You may need to change 10 to be a little lower or higher to differentiate your s
 # Wrap up
 
 That is it for now. Hopefully you have found something you can use here. Keep coming back as we will start to visualize the data and add to it as we try to make it more and more like something you will encounter in your work place. 
+
+# Just the code
+
+Thanks to [Yihui Xie](https://yihui.org/) and [Lucy D'Agostino](https://www.lucymcgowan.com/), I stumbled across this bit of [sorcery](https://yihui.org/en/2018/09/code-appendix/) using `PURL` where you simply include an `R` code chunk to save all of the above code in the appendix.
+
+```{r ref.label = knitr::all_labels(), echo = TRUE, eval = FALSE}
+
+```
