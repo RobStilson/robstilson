@@ -1242,13 +1242,13 @@ Data &amp;lt;- read_excel(&amp;quot;D:/Folder where the file is located/WA_Fn-Us
 ## 4                  7                       3                    0
 ## 5                  2                       2                    2
 ## 6                  7                       3                    6&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Notice we did both of those steps together. To do this we used a pipe, &lt;code&gt;%&amp;gt;%&lt;/code&gt;. Pipes are very useful for string steps of a code together in an easy to read and easy to follow fashion. I typically pronounce &lt;code&gt;%&amp;gt;%&lt;/code&gt; as “then”. So, we mutated our new &lt;code&gt;ID&lt;/code&gt; varable to correspond to row number &lt;em&gt;then&lt;/em&gt; we relocated our &lt;code&gt;ID&lt;/code&gt; variable to be before &lt;code&gt;Age&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Notice we did both of those steps together. To do this we used a pipe, &lt;code&gt;%&amp;gt;%&lt;/code&gt;. Pipes are very useful for string steps of a code together in an easy to read and easy to follow fashion. I typically pronounce &lt;code&gt;%&amp;gt;%&lt;/code&gt; as “then”. So, we mutated our new &lt;code&gt;ID&lt;/code&gt; variable to correspond to row number &lt;em&gt;then&lt;/em&gt; we relocated our &lt;code&gt;ID&lt;/code&gt; variable to be before &lt;code&gt;Age&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;character-data&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Character Data&lt;/h1&gt;
 &lt;p&gt;Now we will get to know the character variables a little bit better.&lt;/p&gt;
-&lt;p&gt;I learned the following methodology from Matt Dancho’s (&lt;span class=&#34;citation&#34;&gt;@mdancho84&lt;/span&gt;) data science class at &lt;a href=&#34;https://www.business-science.io/&#34;&gt;business-science.io&lt;/a&gt;. If you are interested in applying R to business problems, I highly recommend you check his classes out.&lt;/p&gt;
+&lt;p&gt;I learned the following methodology from Matt Dancho’s (&lt;span class=&#34;citation&#34;&gt;@mdancho84&lt;/span&gt;) data science class at &lt;a href=&#34;https://www.business-science.io/&#34;&gt;business-science.io&lt;/a&gt;. If you are interested in applying &lt;code&gt;R&lt;/code&gt; to business problems, I highly recommend you check his classes out.&lt;/p&gt;
 &lt;p&gt;We’re now going to use some more of our &lt;code&gt;dplyr&lt;/code&gt; verbs. First up is &lt;code&gt;select_if&lt;/code&gt;. This makes it easier to select certain types of data. In this case, it will be character data. We can pair it with &lt;code&gt;is.character&lt;/code&gt; and pipe in &lt;code&gt;glimpse&lt;/code&gt;.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Data %&amp;gt;%
   select_if(is.character) %&amp;gt;%
