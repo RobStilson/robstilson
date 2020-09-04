@@ -289,7 +289,7 @@ Notice we did both of those steps together. To do this we used a pipe, `%>%`. Pi
 
 Now we will get to know the character variables a little bit better. 
 
-I learned the following methodology from Matt Dancho's (@mdancho84) data science class at [business.science.io](business.science.io). If you are interested in applying R to business problems, I highly recommend you check his classes out.
+I learned the following methodology from Matt Dancho's (@mdancho84) data science class at [https://www.business-science.io/](https://www.business-science.io/). If you are interested in applying R to business problems, I highly recommend you check his classes out.
 
 We're now going to use some more of our `dplyr` verbs. First up is `select_if`. This makes it easier to select certain types of data. In this case, it will be character data. We can pair it with `is.character` and pipe in `glimpse`.
 
@@ -438,7 +438,7 @@ Values_for_Excel <- Data %>%
 
 A neat trick I learned from Matt Dancho's class is the following for determining if a numeric variables is more likely continuous or discrete.
 
-Values higher than 10 are probably continuous. `PercenetSalaryHike`, `YearsSinceLastPromotion`, etc. 
+Values higher than 10 are probably continuous. `PercentSalaryHike`, `YearsSinceLastPromotion`, etc. 
 ```{r}
 Data %>%
     select_if(is.numeric) %>%
