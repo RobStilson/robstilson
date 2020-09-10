@@ -26,7 +26,7 @@ date_format = "Jan 2006"
   location = "Georgia"
   date_start = "2019-05-01"
   date_end = ""
-  description = """Taught advanced analytics in R."""
+  description = """* Taught advanced analytics in R."""
   
 [[experience]]
   title = "People Analytics, Staff"
@@ -35,8 +35,8 @@ date_format = "Jan 2006"
   location = "Georgia"
   date_start = "2018-02-01"
   date_end = ""
-  description = """Performed Natural Language Processing (NLP) on survey and social media comments to determine themes.
+  description = """* Performed Natural Language Processing (NLP) on survey and social media comments to determine themes.
   
-  Conducted survey analysis on company-wide Engagement and Exit surveys."""
+  * Conducted survey analysis on company-wide Engagement and Exit surveys."""
 
 +++
