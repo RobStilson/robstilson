@@ -36,6 +36,7 @@ date_format = "Jan 2006"
   date_start = "2018-02-01"
   date_end = ""
   description = """* Performed Natural Language Processing (NLP) on survey and social media comments to determine themes.
+  
   * Conducted survey analysis on company-wide Engagement and Exit surveys."""
 
 [[experience]]
