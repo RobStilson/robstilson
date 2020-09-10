@@ -1,0 +1,394 @@
+---
+title: Getting data from GitHub
+author: Rob Stilson
+date: '2020-09-09'
+slug: getting-data-from-github-part-1
+categories:
+  - Joins
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-09-09T20:02:04-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+# Summary
+
+In this post I will introduce you to getting data from existing GitHub sites. We will use data sets found on Dragana Pavolovic's [GitHub page under her Data_analysis repository](https://github.com/Dragana236/Data_analysis). I discovered this from one of her blog post and it accentuates the HR data from the IBM Watson Analytics Lab. 
+
+First in Part 1, we will download the data into Excel and save it for posterity using the `openxlsx` package. We will give each data frame its own tab or worksheet in Excel so that it is all in one place. Then, in Part 2 we will show how we upload the data to give you a feel for how you would could bring data into R from an Excel workbook that has multiple worksheets. In Part 3, we will join all of the worksheets together in R using joins from `dplyr`. Part 4, will consists of some additional EDA with all of the data joined together. We will focus on wide and tall data in Part 5 as we take the data from a single row per person to multiple rows per person as we tidy the data. Part 6 will show off some of the advantages of having your data in tall form. Part 7 will introduce the `ggplot2` package for data visualization.
+
+## Get Packages
+
+If you've read my post before, this may be repetitive, but this code chunk will load the necessary packages for the analysis. I've been using `pacman` for years and I encourage you to check it out as well. The `tryCatch` portion of the code will check your machine to see if `pacman` has already been installed. If it finds `pacman`, it will download it and if not it will move on. The `pacman::p_load` function is a wrapper for `library` and `require` and checks to see if the listed packages are installed. If they are not, it will attempt to install them from CRAN and/or any other repository in the `pacman` repository list (See *Description* under `?p_load` for additional information).
+
+As a best practice, I also like to give a brief snippet of what each of the packages I'm loading will do in the analysis. This is helpful for anybody else who I send my code to, but also for myself if I need to come back to the code 6 months or more down the line.
+
+```{r load packages, echo = FALSE, include= FALSE, warning = FALSE, message = FALSE}
+#' <!-- ####################################################################################################### -->
+#' <!-- ####################################################################################################### -->
+#' <!-- ##################################LOADING PACKAGES##################################################### -->
+
+tryCatch(require(pacman),finally=utils:::install.packages(pkgs='pacman',repos='http://cran.r-project.org'));
+require(pacman)
+
+# if the above doesn't work, use this code#
+# tryCatch
+# detach("package:pacman", unload = TRUE)
+# install.packages("pacman", dependencies = TRUE)
+# install.packages("pacman")
+
+pacman::p_load(modeldata, # data sets useful for modeling packages
+               dplyr, # a grammar of data manipulation
+               tidyr, # tidy messy data
+               readxl, # read Excel files
+               ggplot2, # create elegant data visualisations using the grammar of graphics
+               knitr, # a general-purpose package for dynamic report generation in R
+               broom, # convert statistical objects into tidy tibbles
+               purrr, # functional programming tools
+               psych, #procedures for psychological, psychometric, and personality research
+               conflicted, # an alternative conflict resolution strategy for like named function in different libraries
+               janitor, # simple tools for examining and cleaning dirty data
+               skimr, # compact and flexible summaries of data
+               openxlsx, # read write and edit xlsx files
+               RCurl, # general Network (HTTP/FTP/...) Client Interface for R
+               tidyquant, # tidy quantitative financial analysis
+               tidylog # logging for `dplyr` and `tidyr` functions
+)
+
+```
+
+## Load packages
+
+Here I'm explicitly calling the packages via `library`. Notice that `tidylog` is at the very end. This is necessary to load after `dplyr` so that all of the functions from `tidylog` work correctly. This is used in conjunction with the `conflicted` package. You can read more about it [here](https://github.com/elbersb/tidylog/blob/master/README.md).
+
+```{r, echo = FALSE, include= FALSE, warning = FALSE, message = FALSE}
+
+#' <!-- #Loading libraries -->
+
+suppressPackageStartupMessages({
+  library(modeldata)      
+  library(dplyr)
+  library(tidyr)
+  library(readxl)
+  library(ggplot2)
+  library(knitr)
+  library(broom)
+  library(purrr)
+  library(psych)
+  library(conflicted)
+  library(janitor)
+  library(skimr)
+  library(openxlsx)
+  library(RCurl)
+  library(tidyquant)
+  library(tidylog, warn.conflicts = FALSE)
+})
+
+for (f in getNamespaceExports("tidylog")) {
+    conflicted::conflict_prefer(f, "tidylog", quiet = TRUE)
+}
+
+```
+
+```{r}
+conflict_prefer("filter", "dplyr")
+```
+
+
+## Bring in the data
+
+Now we will grab the data off of Github. We will bring it in alphabetically for no particular reason but to help us keep track of what we have and haven't downloaded. While you are here, I encourage you to check out Dragana's excellent write up of Human Resource Analytics [here](https://github.com/Dragana236/Data_analysis/blob/master/Human_resource_analytics.Rmd)
+
+```{r}
+library(RCurl)
+x <- getURL("https://raw.githubusercontent.com/Dragana236/Data_analysis/master/accident_data.csv")
+accident <- read.csv(text = x)
+```
+
+## Structure of GitHub pull
+
+Let's quickly break down what just happened in case you would also like to get some data off of GitHub that is from a different site.
+
+First, we have `https://raw.githubusercontent.com`. This is important! You can't just feed in the regular URL as if you are looking at the data on her site. In that case it would be [github.com/Dragana236/Data_analysis](github.com/Dragana236/Data_analysis). So remember to use `https://raw.githubusercontent.com` before you go to double face palm land out of frustration. The next portion of the code is straight forward. Simply `/Dragana236`. This will be the name of the persons extension on GitHub. Mine is simply `/RobStilson`. After that, we need to put in the specific repository on GitHub, so in this case `/Data_analysis`. If the name of the repository was Super_Fun_Data, then you would put in `/Super_Fun_Data` here. After the reposistory we specify `master`. Don't worry too much about that right now. Finally, we put in the actual name of the data we're looking for. In this instance, it is `accident_data.csv`. This part will be the only portion of the code that changes as we work through and download all of the relevant data from this GitHub account.
+
+## Take a look at the data
+
+### Skimr::skim
+
+We won't go too deep into this as we covered a lot of this in a previous [EDA post](http://robstilson.rbind.io/post/exploratory-data-analysis-part-1/). We'll use the handy `skimr` package again for the `skim` function.
+
+```{r}
+library(skimr)
+skim(accident)
+```
+
+Hooray, we have an `employee_id` variable! This will make joining the data to our main `attrition` data set much easier. We also have another numeric column called `year` and a character column called `accident_type`.
+
+### janitor::tabyl
+
+Since we have a character column type, we'll take an additional peek with the `janitor::tabyl` function. Remember to use your `$` to call the `accident_type` column.
+
+```{r}
+library(janitor)
+tabyl(accident$accident_type)
+```
+
+This table shows us that we have 3 accident types, Mild, Moderate, and Severe and an `n` count and `percent` for each.
+
+# Bring in more data
+
+```{r}
+library(RCurl)
+x <- getURL("https://raw.githubusercontent.com/Dragana236/Data_analysis/master/fair_pay.csv")
+fair_pay <- read.csv(text = x)
+
+x <- getURL("https://raw.githubusercontent.com/Dragana236/Data_analysis/master/hr_data.csv")
+hr <- read.csv(text = x)
+
+x <- getURL("https://raw.githubusercontent.com/Dragana236/Data_analysis/master/hr_2.csv")
+hr_2 <- read.csv(text = x)
+
+x <- getURL("https://raw.githubusercontent.com/Dragana236/Data_analysis/master/performance_data.csv")
+performance <- read.csv(text = x)
+
+x <- getURL("https://raw.githubusercontent.com/Dragana236/Data_analysis/master/recruitment_data.csv")
+recruitment <- read.csv(text = x)
+
+x <- getURL("https://raw.githubusercontent.com/Dragana236/Data_analysis/master/survey_data.csv")
+survey <- read.csv(text = x)
+
+x <- getURL("https://raw.githubusercontent.com/Dragana236/Data_analysis/master/survey_2.csv")
+survey_2 <- read.csv(text = x)
+```
+
+We could take a look at all of this additional data in R, but let's say you would like to show this to your boss or colleagues who are not R users(...yet). It is more likely that they will have something like Excel, Google Sheets, etc. For now, we will stick with Excel, but we may return to Google Sheets in a future post. Anyway, how do we get our newly found data from R into Excel? Enter the `openxlsx` package! I really like the `openxlsx` package because it makes getting the data from R into Excel really easy and it doesn't have any Java dependencies which can prove problematic (at least for me...). We won't go too in depth into the `openxlsx` package here, but there are many great tutorials available and I encourage you to look around for them if you are interested. 
+
+## Exporting the data to Excel with `openxlsx`
+
+To export the data to Excel, we will create a workbook and then using styles, headers, etc., we'll make the data pretty and then also put each df into its own worksheet.
+
+```{r, eval = FALSE}
+wb <- openxlsx::createWorkbook() #Create a work book
+
+#########################
+# accident              #
+#########################
+
+addWorksheet(wb, "accident") #name the worksheet in Excel. This does not have to be the same as the df going into it.
+
+writeData(wb, "accident", accident) # write the `accident` data into your worksheet "accident".
+
+#Create style
+
+style1 <- createStyle(fontColour = "#000080", textDecoration = "Bold") #Choose your custom font color (https://www.rgbtohex.net/) and make it bold. Call it style1
+
+addStyle(wb, style = style1, rows = 1, cols = 1:3, sheet = "accident") #add this style to your worksheet. Tell it which rows and columns
+
+#Freeze Panes (your co-workers will love you!)
+
+#Also check here: https://stackoverflow.com/questions/37677326/applying-style-to-all-sheets-of-a-workbook-using-openxlsx-package-in-r
+
+freezePane(wb, "accident", firstActiveRow = 2) #Freeze those panes. You know you want to. Tell it where to start.
+
+#Add filter
+
+addFilter(wb, "accident", row = 1, cols = 1:3) #Add your filter as well. If you're trying to impress, you might as well go all in :)
+
+#########################
+# fair_pay              #
+#########################
+
+addWorksheet(wb, "fair_pay") #name the worksheet in Excel. This does not have to be the same as the df going into it.
+
+writeData(wb, "fair_pay", fair_pay) # write the `fair_pay` data into your worksheet "fair_pay".
+
+#Create style
+
+style1 <- createStyle(fontColour = "#000080", textDecoration = "Bold") #Choose your custom font color (https://www.rgbtohex.net/) and make it bold. Call it style1
+
+addStyle(wb, style = style1, rows = 1, cols = 1:5, sheet = "fair_pay") #add this style to your worksheet. Tell it which rows and columns
+
+#Freeze Panes (your co-workers will love you!)
+
+#Also check here: https://stackoverflow.com/questions/37677326/applying-style-to-all-sheets-of-a-workbook-using-openxlsx-package-in-r
+
+freezePane(wb, "fair_pay", firstActiveRow = 2) #Freeze those panes. You know you want to. Tell it where to start.
+
+#Add filter
+
+addFilter(wb, "fair_pay", row = 1, cols = 1:5) #Add your filter as well. If you're trying to impress, you might as well go all in :)
+
+#########################
+# hr                    #
+#########################
+
+addWorksheet(wb, "hr") #name the worksheet in Excel. This does not have to be the same as the df going into it.
+
+writeData(wb, "hr", hr) # write the `hr` data into your worksheet "hr".
+
+#Create style
+
+style1 <- createStyle(fontColour = "#000080", textDecoration = "Bold") #Choose your custom font color (https://www.rgbtohex.net/) and make it bold. Call it style1
+
+addStyle(wb, style = style1, rows = 1, cols = 1:4, sheet = "hr") #add this style to your worksheet. Tell it which rows and columns
+
+#Freeze Panes (your co-workers will love you!)
+
+#Also check here: https://stackoverflow.com/questions/37677326/applying-style-to-all-sheets-of-a-workbook-using-openxlsx-package-in-r
+
+freezePane(wb, "hr", firstActiveRow = 2) #Freeze those panes. You know you want to. Tell it where to start.
+
+#Add filter
+
+addFilter(wb, "hr", row = 1, cols = 1:4) #Add your filter as well. If you're trying to impress, you might as well go all in :)
+
+#########################
+# hr_2                  #
+#########################
+
+addWorksheet(wb, "hr_2") #name the worksheet in Excel. This does not have to be the same as the df going into it.
+
+writeData(wb, "hr_2", hr_2) # write the `hr_2` data into your worksheet "hr_2".
+
+#Create style
+
+style1 <- createStyle(fontColour = "#000080", textDecoration = "Bold") #Choose your custom font color (https://www.rgbtohex.net/) and make it bold. Call it style1
+
+addStyle(wb, style = style1, rows = 1, cols = 1:4, sheet = "hr_2") #add this style to your worksheet. Tell it which rows and columns
+
+#Freeze Panes (your co-workers will love you!)
+
+#Also check here: https://stackoverflow.com/questions/37677326/applying-style-to-all-sheets-of-a-workbook-using-openxlsx-package-in-r
+
+freezePane(wb, "hr_2", firstActiveRow = 2) #Freeze those panes. You know you want to. Tell it where to start.
+
+#Add filter
+
+addFilter(wb, "hr_2", row = 1, cols = 1:4) #Add your filter as well. If you're trying to impress, you might as well go all in :)
+
+#########################
+# performance           #
+#########################
+
+addWorksheet(wb, "performance") #name the worksheet in Excel. This does not have to be the same as the df going into it.
+
+writeData(wb, "performance", performance) # write the `performance` data into your worksheet "performance".
+
+#Create style
+
+style1 <- createStyle(fontColour = "#000080", textDecoration = "Bold") #Choose your custom font color (https://www.rgbtohex.net/) and make it bold. Call it style1
+
+addStyle(wb, style = style1, rows = 1, cols = 1:2, sheet = "performance") #add this style to your worksheet. Tell it which rows and columns
+
+#Freeze Panes (your co-workers will love you!)
+
+#Also check here: https://stackoverflow.com/questions/37677326/applying-style-to-all-sheets-of-a-workbook-using-openxlsx-package-in-r
+
+freezePane(wb, "performance", firstActiveRow = 2) #Freeze those panes. You know you want to. Tell it where to start.
+
+#Add filter
+
+addFilter(wb, "performance", row = 1, cols = 1:2) #Add your filter as well. If you're trying to impress, you might as well go all in :)
+
+#########################
+# recruitment           #
+#########################
+
+addWorksheet(wb, "recruitment") #name the worksheet in Excel. This does not have to be the same as the df going into it.
+
+writeData(wb, "recruitment", recruitment) # write the `recruitment` data into your worksheet "recruitment".
+
+#Create style
+
+style1 <- createStyle(fontColour = "#000080", textDecoration = "Bold") #Choose your custom font color (https://www.rgbtohex.net/) and make it bold. Call it style1
+
+addStyle(wb, style = style1, rows = 1, cols = 1:4, sheet = "recruitment") #add this style to your worksheet. Tell it which rows and columns
+
+#Freeze Panes (your co-workers will love you!)
+
+#Also check here: https://stackoverflow.com/questions/37677326/applying-style-to-all-sheets-of-a-workbook-using-openxlsx-package-in-r
+
+freezePane(wb, "recruitment", firstActiveRow = 2) #Freeze those panes. You know you want to. Tell it where to start.
+
+#Add filter
+
+addFilter(wb, "recruitment", row = 1, cols = 1:4) #Add your filter as well. If you're trying to impress, you might as well go all in :)
+
+#########################
+# survey                #
+#########################
+
+addWorksheet(wb, "survey") #name the worksheet in Excel. This does not have to be the same as the df going into it.
+
+writeData(wb, "survey", survey) # write the `survey` data into your worksheet "survey".
+
+#Create style
+
+style1 <- createStyle(fontColour = "#000080", textDecoration = "Bold") #Choose your custom font color (https://www.rgbtohex.net/) and make it bold. Call it style1
+
+addStyle(wb, style = style1, rows = 1, cols = 1:5, sheet = "survey") #add this style to your worksheet. Tell it which rows and columns
+
+#Freeze Panes (your co-workers will love you!)
+
+#Also check here: https://stackoverflow.com/questions/37677326/applying-style-to-all-sheets-of-a-workbook-using-openxlsx-package-in-r
+
+freezePane(wb, "survey", firstActiveRow = 2) #Freeze those panes. You know you want to. Tell it where to start.
+
+#Add filter
+
+addFilter(wb, "survey", row = 1, cols = 1:5) #Add your filter as well. If you're trying to impress, you might as well go all in :)
+
+#########################
+# survey_2              #
+#########################
+
+addWorksheet(wb, "survey_2") #name the worksheet in Excel. This does not have to be the same as the df going into it.
+
+writeData(wb, "survey_2", survey_2) # write the `survey_2` data into your worksheet "survey_2".
+
+#Create style
+
+style1 <- createStyle(fontColour = "#000080", textDecoration = "Bold") #Choose your custom font color (https://www.rgbtohex.net/) and make it bold. Call it style1
+
+addStyle(wb, style = style1, rows = 1, cols = 1:3, sheet = "survey_2") #add this style to your worksheet. Tell it which rows and columns
+
+#Freeze Panes (your co-workers will love you!)
+
+#Also check here: https://stackoverflow.com/questions/37677326/applying-style-to-all-sheets-of-a-workbook-using-openxlsx-package-in-r
+
+freezePane(wb, "survey_2", firstActiveRow = 2) #Freeze those panes. You know you want to. Tell it where to start.
+
+#Add filter
+
+addFilter(wb, "survey_2", row = 1, cols = 1:3) #Add your filter as well. If you're trying to impress, you might as well go all in :)
+
+#Now we'll do a fancy save by customizing the file name using paste0 and system time. We'll also assume this was for the previous month. You'll also need to make this path the one you want on your computer. 
+
+
+saveWorkbook(wb, paste0("00_Data/Additional Data for Attrition Data Set_", format(Sys.Date(), "%d_%m_%Y") , ".xlsx"), overwrite = TRUE)
+
+```
+
+# Wrap up
+
+You have now downloaded the data off of Github and put each df into its own worksheet in Excel, made the column names bold, added a custom color, frozen the panes, added a filter, and named the file with a data extension!
+
+I hope you have enjoyed reading this and working through this on your own and now feel like you can do this with your own projects. Please join us for the subsequent parts as we continue to build out and explore this new data along with the original `attrition` data set.
+
+# Just the code
+
+Thanks to [Yihui Xie](https://yihui.org/) and [Lucy D'Agostino](https://www.lucymcgowan.com/), I stumbled across this bit of [sorcery](https://yihui.org/en/2018/09/code-appendix/) using `PURL` where you simply include an `R` code chunk to save all of the above code in the appendix.
+
+```{r ref.label = knitr::all_labels(), echo = TRUE, eval = FALSE}
+
+```

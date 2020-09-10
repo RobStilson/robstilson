@@ -34,7 +34,22 @@
   
   <url>
     <loc>http://robstilson.rbind.io/categories/</loc>
-    <lastmod>2020-08-21T14:51:39-04:00</lastmod>
+    <lastmod>2020-09-09T20:02:04-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/post/getting-data-from-github-part-1/</loc>
+    <lastmod>2020-09-09T20:02:04-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/category/joins/</loc>
+    <lastmod>2020-09-09T20:02:04-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/post/</loc>
+    <lastmod>2020-09-09T20:02:04-04:00</lastmod>
   </url>
   
   <url>
@@ -44,11 +59,6 @@
   
   <url>
     <loc>http://robstilson.rbind.io/post/exploratory-data-analysis-part-1/</loc>
-    <lastmod>2020-08-21T14:51:39-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://robstilson.rbind.io/post/</loc>
     <lastmod>2020-08-21T14:51:39-04:00</lastmod>
   </url>
   
