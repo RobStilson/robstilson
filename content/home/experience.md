@@ -30,13 +30,22 @@ date_format = "Jan 2006"
   
 [[experience]]
   title = "People Analytics, Staff"
-  company = "Large Aerospace and Defense Company"
+  company = "A Large Aerospace and Defense Company"
   company_url = ""
   location = "Georgia"
   date_start = "2018-02-01"
   date_end = ""
   description = """* Performed Natural Language Processing (NLP) on survey and social media comments to determine themes.
-  
   * Conducted survey analysis on company-wide Engagement and Exit surveys."""
+
+[[experience]]
+  title = "Director of Assessments and Testing"
+  company = "A Boutique Consulting Firm"
+  company_url = ""
+  location = "Georgia"
+  date_start = "2016-12-01"
+  date_end = "2018-02-01"
+  description = """*	Automated Employee Engagement survey reporting utilizing the ReporteRs package in R.
+  * Automated and customized internal client reports using SQL, R, and R Markdown to enable better anticipation of a client’s future needs for our Client Success team."""
 
 +++
