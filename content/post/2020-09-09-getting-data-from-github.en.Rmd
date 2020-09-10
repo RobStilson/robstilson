@@ -107,7 +107,7 @@ conflict_prefer("filter", "dplyr")
 
 ## Bring in the data
 
-Now we will grab the data off of Github. We will bring it in alphabetically for no particular reason but to help us keep track of what we have and haven't downloaded. While you are here, I encourage you to check out Dragana's excellent write up of Human Resource Analytics [here](https://github.com/Dragana236/Data_analysis/blob/master/Human_resource_analytics.Rmd)
+Now we will grab the data off of GitHub. We will bring it in alphabetically for no particular reason but to help us keep track of what we have and haven't downloaded. While you are here, I encourage you to check out Dragana's excellent write up of Human Resource Analytics [here](https://github.com/Dragana236/Data_analysis/blob/master/Human_resource_analytics.Rmd)
 
 ```{r}
 library(RCurl)
@@ -119,7 +119,7 @@ accident <- read.csv(text = x)
 
 Let's quickly break down what just happened in case you would also like to get some data off of GitHub that is from a different site.
 
-First, we have `https://raw.githubusercontent.com`. This is important! You can't just feed in the regular URL as if you are looking at the data on her site. In that case it would be [github.com/Dragana236/Data_analysis](github.com/Dragana236/Data_analysis). So remember to use `https://raw.githubusercontent.com` before you go to double face palm land out of frustration. The next portion of the code is straight forward. Simply `/Dragana236`. This will be the name of the persons extension on GitHub. Mine is simply `/RobStilson`. After that, we need to put in the specific repository on GitHub, so in this case `/Data_analysis`. If the name of the repository was Super_Fun_Data, then you would put in `/Super_Fun_Data` here. After the reposistory we specify `master`. Don't worry too much about that right now. Finally, we put in the actual name of the data we're looking for. In this instance, it is `accident_data.csv`. This part will be the only portion of the code that changes as we work through and download all of the relevant data from this GitHub account.
+First, we have `https://raw.githubusercontent.com`. This is important! You can't just feed in the regular URL as if you are looking at the data on her site. In that case it would be [github.com/Dragana236/Data_analysis](github.com/Dragana236/Data_analysis). So remember to use `https://raw.githubusercontent.com` before you go to double face palm land out of frustration. The next portion of the code is straight forward. Simply `/Dragana236`. This will be the name of the person's extension on GitHub. Mine is simply `/RobStilson`. After that, we need to put in the specific repository on GitHub, so in this case `/Data_analysis`. If the name of the repository was Super_Fun_Data, then you would put in `/Super_Fun_Data` here. After the repository we specify `master`. Don't worry too much about that right now. Finally, we put in the actual name of the data we're looking for. In this instance, it is `accident_data.csv`. This part will be the only portion of the code that changes as we work through and download all of the relevant data from this GitHub account.
 
 ## Take a look at the data
 
@@ -381,13 +381,11 @@ saveWorkbook(wb, paste0("00_Data/Additional Data for Attrition Data Set_", forma
 
 # Wrap up
 
-You have now downloaded the data off of Github and put each df into its own worksheet in Excel, made the column names bold, added a custom color, frozen the panes, added a filter, and named the file with a data extension!
+You have now downloaded the data off of GitHub and put each df into its own worksheet in Excel, made the column names bold, added a custom color, frozen the panes, added a filter, and named the file with a data extension!
 
 I hope you have enjoyed reading this and working through this on your own and now feel like you can do this with your own projects. Please join us for the subsequent parts as we continue to build out and explore this new data along with the original `attrition` data set.
 
 # Just the code
-
-Thanks to [Yihui Xie](https://yihui.org/) and [Lucy D'Agostino](https://www.lucymcgowan.com/), I stumbled across this bit of [sorcery](https://yihui.org/en/2018/09/code-appendix/) using `PURL` where you simply include an `R` code chunk to save all of the above code in the appendix.
 
 ```{r ref.label = knitr::all_labels(), echo = TRUE, eval = FALSE}
 

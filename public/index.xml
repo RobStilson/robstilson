@@ -121,7 +121,7 @@
 &lt;/div&gt;
 &lt;div id=&#34;bring-in-the-data&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Bring in the data&lt;/h2&gt;
-&lt;p&gt;Now we will grab the data off of Github. We will bring it in alphabetically for no particular reason but to help us keep track of what we have and haven’t downloaded. While you are here, I encourage you to check out Dragana’s excellent write up of Human Resource Analytics &lt;a href=&#34;https://github.com/Dragana236/Data_analysis/blob/master/Human_resource_analytics.Rmd&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Now we will grab the data off of GitHub. We will bring it in alphabetically for no particular reason but to help us keep track of what we have and haven’t downloaded. While you are here, I encourage you to check out Dragana’s excellent write up of Human Resource Analytics &lt;a href=&#34;https://github.com/Dragana236/Data_analysis/blob/master/Human_resource_analytics.Rmd&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(RCurl)
 x &amp;lt;- getURL(&amp;quot;https://raw.githubusercontent.com/Dragana236/Data_analysis/master/accident_data.csv&amp;quot;)
 accident &amp;lt;- read.csv(text = x)&lt;/code&gt;&lt;/pre&gt;
@@ -129,7 +129,7 @@ accident &amp;lt;- read.csv(text = x)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;structure-of-github-pull&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Structure of GitHub pull&lt;/h2&gt;
 &lt;p&gt;Let’s quickly break down what just happened in case you would also like to get some data off of GitHub that is from a different site.&lt;/p&gt;
-&lt;p&gt;First, we have &lt;code&gt;https://raw.githubusercontent.com&lt;/code&gt;. This is important! You can’t just feed in the regular URL as if you are looking at the data on her site. In that case it would be &lt;a href=&#34;github.com/Dragana236/Data_analysis&#34;&gt;github.com/Dragana236/Data_analysis&lt;/a&gt;. So remember to use &lt;code&gt;https://raw.githubusercontent.com&lt;/code&gt; before you go to double face palm land out of frustration. The next portion of the code is straight forward. Simply &lt;code&gt;/Dragana236&lt;/code&gt;. This will be the name of the persons extension on GitHub. Mine is simply &lt;code&gt;/RobStilson&lt;/code&gt;. After that, we need to put in the specific repository on GitHub, so in this case &lt;code&gt;/Data_analysis&lt;/code&gt;. If the name of the repository was Super_Fun_Data, then you would put in &lt;code&gt;/Super_Fun_Data&lt;/code&gt; here. After the reposistory we specify &lt;code&gt;master&lt;/code&gt;. Don’t worry too much about that right now. Finally, we put in the actual name of the data we’re looking for. In this instance, it is &lt;code&gt;accident_data.csv&lt;/code&gt;. This part will be the only portion of the code that changes as we work through and download all of the relevant data from this GitHub account.&lt;/p&gt;
+&lt;p&gt;First, we have &lt;code&gt;https://raw.githubusercontent.com&lt;/code&gt;. This is important! You can’t just feed in the regular URL as if you are looking at the data on her site. In that case it would be &lt;a href=&#34;github.com/Dragana236/Data_analysis&#34;&gt;github.com/Dragana236/Data_analysis&lt;/a&gt;. So remember to use &lt;code&gt;https://raw.githubusercontent.com&lt;/code&gt; before you go to double face palm land out of frustration. The next portion of the code is straight forward. Simply &lt;code&gt;/Dragana236&lt;/code&gt;. This will be the name of the person’s extension on GitHub. Mine is simply &lt;code&gt;/RobStilson&lt;/code&gt;. After that, we need to put in the specific repository on GitHub, so in this case &lt;code&gt;/Data_analysis&lt;/code&gt;. If the name of the repository was Super_Fun_Data, then you would put in &lt;code&gt;/Super_Fun_Data&lt;/code&gt; here. After the repository we specify &lt;code&gt;master&lt;/code&gt;. Don’t worry too much about that right now. Finally, we put in the actual name of the data we’re looking for. In this instance, it is &lt;code&gt;accident_data.csv&lt;/code&gt;. This part will be the only portion of the code that changes as we work through and download all of the relevant data from this GitHub account.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;take-a-look-at-the-data&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Take a look at the data&lt;/h2&gt;
@@ -496,12 +496,11 @@ saveWorkbook(wb, paste0(&amp;quot;00_Data/Additional Data for Attrition Data Set
 &lt;/div&gt;
 &lt;div id=&#34;wrap-up&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Wrap up&lt;/h1&gt;
-&lt;p&gt;You have now downloaded the data off of Github and put each df into its own worksheet in Excel, made the column names bold, added a custom color, frozen the panes, added a filter, and named the file with a data extension!&lt;/p&gt;
+&lt;p&gt;You have now downloaded the data off of GitHub and put each df into its own worksheet in Excel, made the column names bold, added a custom color, frozen the panes, added a filter, and named the file with a data extension!&lt;/p&gt;
 &lt;p&gt;I hope you have enjoyed reading this and working through this on your own and now feel like you can do this with your own projects. Please join us for the subsequent parts as we continue to build out and explore this new data along with the original &lt;code&gt;attrition&lt;/code&gt; data set.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;just-the-code&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Just the code&lt;/h1&gt;
-&lt;p&gt;Thanks to &lt;a href=&#34;https://yihui.org/&#34;&gt;Yihui Xie&lt;/a&gt; and &lt;a href=&#34;https://www.lucymcgowan.com/&#34;&gt;Lucy D’Agostino&lt;/a&gt;, I stumbled across this bit of &lt;a href=&#34;https://yihui.org/en/2018/09/code-appendix/&#34;&gt;sorcery&lt;/a&gt; using &lt;code&gt;PURL&lt;/code&gt; where you simply include an &lt;code&gt;R&lt;/code&gt; code chunk to save all of the above code in the appendix.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#&amp;#39; &amp;lt;!-- ####################################################################################################### --&amp;gt;
 #&amp;#39; &amp;lt;!-- ####################################################################################################### --&amp;gt;
 #&amp;#39; &amp;lt;!-- ##################################LOADING PACKAGES##################################################### --&amp;gt;

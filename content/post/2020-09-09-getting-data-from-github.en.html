@@ -60,7 +60,7 @@ output:
 </div>
 <div id="bring-in-the-data" class="section level2">
 <h2>Bring in the data</h2>
-<p>Now we will grab the data off of Github. We will bring it in alphabetically for no particular reason but to help us keep track of what we have and haven’t downloaded. While you are here, I encourage you to check out Dragana’s excellent write up of Human Resource Analytics <a href="https://github.com/Dragana236/Data_analysis/blob/master/Human_resource_analytics.Rmd">here</a></p>
+<p>Now we will grab the data off of GitHub. We will bring it in alphabetically for no particular reason but to help us keep track of what we have and haven’t downloaded. While you are here, I encourage you to check out Dragana’s excellent write up of Human Resource Analytics <a href="https://github.com/Dragana236/Data_analysis/blob/master/Human_resource_analytics.Rmd">here</a></p>
 <pre class="r"><code>library(RCurl)
 x &lt;- getURL(&quot;https://raw.githubusercontent.com/Dragana236/Data_analysis/master/accident_data.csv&quot;)
 accident &lt;- read.csv(text = x)</code></pre>
@@ -68,7 +68,7 @@ accident &lt;- read.csv(text = x)</code></pre>
 <div id="structure-of-github-pull" class="section level2">
 <h2>Structure of GitHub pull</h2>
 <p>Let’s quickly break down what just happened in case you would also like to get some data off of GitHub that is from a different site.</p>
-<p>First, we have <code>https://raw.githubusercontent.com</code>. This is important! You can’t just feed in the regular URL as if you are looking at the data on her site. In that case it would be <a href="github.com/Dragana236/Data_analysis">github.com/Dragana236/Data_analysis</a>. So remember to use <code>https://raw.githubusercontent.com</code> before you go to double face palm land out of frustration. The next portion of the code is straight forward. Simply <code>/Dragana236</code>. This will be the name of the persons extension on GitHub. Mine is simply <code>/RobStilson</code>. After that, we need to put in the specific repository on GitHub, so in this case <code>/Data_analysis</code>. If the name of the repository was Super_Fun_Data, then you would put in <code>/Super_Fun_Data</code> here. After the reposistory we specify <code>master</code>. Don’t worry too much about that right now. Finally, we put in the actual name of the data we’re looking for. In this instance, it is <code>accident_data.csv</code>. This part will be the only portion of the code that changes as we work through and download all of the relevant data from this GitHub account.</p>
+<p>First, we have <code>https://raw.githubusercontent.com</code>. This is important! You can’t just feed in the regular URL as if you are looking at the data on her site. In that case it would be <a href="github.com/Dragana236/Data_analysis">github.com/Dragana236/Data_analysis</a>. So remember to use <code>https://raw.githubusercontent.com</code> before you go to double face palm land out of frustration. The next portion of the code is straight forward. Simply <code>/Dragana236</code>. This will be the name of the person’s extension on GitHub. Mine is simply <code>/RobStilson</code>. After that, we need to put in the specific repository on GitHub, so in this case <code>/Data_analysis</code>. If the name of the repository was Super_Fun_Data, then you would put in <code>/Super_Fun_Data</code> here. After the repository we specify <code>master</code>. Don’t worry too much about that right now. Finally, we put in the actual name of the data we’re looking for. In this instance, it is <code>accident_data.csv</code>. This part will be the only portion of the code that changes as we work through and download all of the relevant data from this GitHub account.</p>
 </div>
 <div id="take-a-look-at-the-data" class="section level2">
 <h2>Take a look at the data</h2>
@@ -435,12 +435,11 @@ saveWorkbook(wb, paste0(&quot;00_Data/Additional Data for Attrition Data Set_&qu
 </div>
 <div id="wrap-up" class="section level1">
 <h1>Wrap up</h1>
-<p>You have now downloaded the data off of Github and put each df into its own worksheet in Excel, made the column names bold, added a custom color, frozen the panes, added a filter, and named the file with a data extension!</p>
+<p>You have now downloaded the data off of GitHub and put each df into its own worksheet in Excel, made the column names bold, added a custom color, frozen the panes, added a filter, and named the file with a data extension!</p>
 <p>I hope you have enjoyed reading this and working through this on your own and now feel like you can do this with your own projects. Please join us for the subsequent parts as we continue to build out and explore this new data along with the original <code>attrition</code> data set.</p>
 </div>
 <div id="just-the-code" class="section level1">
 <h1>Just the code</h1>
-<p>Thanks to <a href="https://yihui.org/">Yihui Xie</a> and <a href="https://www.lucymcgowan.com/">Lucy D’Agostino</a>, I stumbled across this bit of <a href="https://yihui.org/en/2018/09/code-appendix/">sorcery</a> using <code>PURL</code> where you simply include an <code>R</code> code chunk to save all of the above code in the appendix.</p>
 <pre class="r"><code>#&#39; &lt;!-- ####################################################################################################### --&gt;
 #&#39; &lt;!-- ####################################################################################################### --&gt;
 #&#39; &lt;!-- ##################################LOADING PACKAGES##################################################### --&gt;
