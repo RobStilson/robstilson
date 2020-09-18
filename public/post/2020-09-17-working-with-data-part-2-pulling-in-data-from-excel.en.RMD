@@ -22,9 +22,7 @@ output:
 
 # Summary
 
-In the last [post](http://robstilson.rbind.io/post/getting-data-from-github-part-1/) we learned how to get data from GitHub. In this post I will introduce you to getting data from existing GitHub sites. We will use data sets found on Dragana Pavolovic's [GitHub page under her Data_analysis repository](https://github.com/Dragana236/Data_analysis). I discovered this from one of her blog post and it accentuates the HR data from the IBM Watson Analytics Lab. 
-
-First in Part 1, we will download the data into Excel and save it for posterity using the `openxlsx` package. We will give each data frame its own tab or worksheet in Excel so that it is all in one place. Then, in Part 2 we will show how we upload the data to give you a feel for how you would could bring data into R from an Excel workbook that has multiple worksheets. In Part 3, we will join all of the worksheets together in R using joins from `dplyr`. Part 4, will consists of some additional EDA with all of the data joined together. We will focus on wide and tall data in Part 5 as we take the data from a single row per person to multiple rows per person as we tidy the data. Part 6 will show off some of the advantages of having your data in tall form. Part 7 will introduce the `ggplot2` package for data visualization.
+In the last [post](http://robstilson.rbind.io/post/getting-data-from-github-part-1/) we learned how to get data from GitHub. In this post I will introduce you to getting data from an Excel file that you have on your desktop. Remember from last time we saved a file called "Additional Data for Attrition Data Set_" that included a time stamp created by R. In my case, the full file name was "Additional Data for Attrition Data Set_09_09_2020.xlsx". Let's pull it back into R using the `readxl` package from the `tidyverse`. Before we begin, remember to get and load the necessary packages.
 
 ## Get Packages
 
@@ -106,4 +104,101 @@ conflict_prefer("filter", "dplyr")
 
 ## Bring in the data
 
-Now we will grab the data off of GitHub. We will bring it in alphabetically for no particular reason but to help us keep track of what we have and haven't downloaded. While you are here, I encourage you to check out Dragana's excellent write up of Human Resource Analytics [here](https://github.com/Dragana236/Data_analysis/blob/master/Human_resource_analytics.Rmd)
+Now we will load the data from our desktop. You will need to change the directory to reflect where you stored the file. We will call the data `df`, which is short for data frame.
+
+```{r}
+library(readxl)
+df <- read_excel("D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx")
+```
+
+Ok, what happened? You should now see the `df` object in your Global Environment, but where is the rest of the data? We had 8 individual tabs and it looks like it only took the first one, `accident`. What if we wanted the `performance` tab instead?
+
+## Importing a specific worksheet from Excel
+
+In order to do that we need to specify the sheet as follows:
+
+```{r}
+library(readxl)
+performance <- read_excel("D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx", sheet = "performance")
+```
+
+Now we have the `performance` data in our Global Environment. We could do this 8 times for each of the sheets, but is there a better way?
+
+## Importing multiple worksheets from Excel
+
+This portion is from [Todd Peterson's RPubs site](https://rpubs.com/tf_peterson/readxl_import) where he shows you how to import multiple worksheets using the `lapply` function.
+
+First, we will save our path as a variable. This is convenient so that we don't have to write out the path name each time.
+
+```{r}
+xl_data <- "D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx"
+```
+
+Now we can feed our `xl_data` containing the path into the `excel_sheets` function from `readxl`.
+
+```{r}
+tab_names <- excel_sheets(path = xl_data)
+```
+
+`tab_names` should appear in your Global Environment under values with the 8 tab names:
+
+* accident
+* fair_pay
+* hr         
+* hr_2        
+* performance 
+* recruitment 
+* survey      
+* survey_2 
+
+We can see all of the names more easily by simply running `tab_names`.
+
+```{r}
+tab_names
+```
+
+If you wanted to remove the quotation marks, you could wrap `tab_names` in the `cat()` function.
+
+```{r}
+cat(tab_names)
+```
+
+Let's say the data you are working with has a large number of tabs. You could wrap `tab_names` in `cat()` and use a separator in order to see them all in a vertical fashion.
+
+```{r}
+cat(tab_names, sep = "\n")
+```
+
+The `"\n"` in the previous code signifies a line break.
+
+You can also place additional characters, like a comma, before the slash to have a vertical list with a comma at the end.
+
+```{r}
+cat(tab_names, sep = ",\n")
+```
+
+Ok, back to actually importing the data. Again, we will use the `lapply` function which you can read more about [here](https://petewerner.blogspot.com/2012/12/using-apply-sapply-lapply-in-r.html) in the famous "Using apply, sapply, lapply in R" blog post.
+
+
+```{r}
+tab_names <- excel_sheets(path = xl_data)
+
+list_all <- lapply(tab_names, function(x) read_excel(path = xl_data, sheet = x))
+
+str(list_all)
+```
+
+Admittedly, I stumbled during this next step. I wanted to get all of the individual data frames back into the environment as they were when we originally pulled them from GitHub. We've got the list now with `list_all`, but how do we actually access the dfs within? [Stackoverflow](https://stackoverflow.com/questions/49359587/import-excel-workbook-with-multiple-sheets) to rescue! The linked post lays out exactly what I wanted to do and we will use that code below.
+
+Name all of the data frames using our `tab_names` object.
+
+```{r}
+names(list_all) <- tab_names
+```
+
+Then use the until now unknown to me function of `list2env` to put them all in the Global Environment. Viola!
+
+```{r}
+list2env(list_all, .GlobalEnv)
+```
+
