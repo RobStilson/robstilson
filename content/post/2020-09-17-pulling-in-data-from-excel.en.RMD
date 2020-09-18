@@ -1,0 +1,21 @@
+---
+title: Working with Data-Part 2-Pulling in data from Excel
+author: robstilson
+date: '2020-09-17'
+slug: working-with-data-part-2-pulling-in-data-from-excel
+categories: []
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-09-17T18:29:46-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+output:
+  blogdown::html_page:
+    toc: true
+---

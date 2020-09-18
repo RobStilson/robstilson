@@ -38,17 +38,17 @@
   </url>
   
   <url>
-    <loc>http://robstilson.rbind.io/post/getting-data-from-github-part-1/</loc>
-    <lastmod>2020-09-09T20:02:04-04:00</lastmod>
-  </url>
-  
-  <url>
     <loc>http://robstilson.rbind.io/category/joins/</loc>
     <lastmod>2020-09-09T20:02:04-04:00</lastmod>
   </url>
   
   <url>
     <loc>http://robstilson.rbind.io/post/</loc>
+    <lastmod>2020-09-09T20:02:04-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/post/working-with-data-part-1-getting-data-from-github/</loc>
     <lastmod>2020-09-09T20:02:04-04:00</lastmod>
   </url>
   
