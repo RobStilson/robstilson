@@ -1,0 +1,167 @@
+---
+title: Working with Data-Part 2-Pulling in data from Excel
+author: Rob Stilson
+date: '2020-09-17'
+slug: working-with-data-part-2-pulling-in-data-from-excel
+categories:
+  - EDA
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-09-21T09:58:45-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#summary">Summary</a><ul>
+<li><a href="#get-packages">Get Packages</a></li>
+<li><a href="#load-packages">Load packages</a></li>
+<li><a href="#bring-in-the-data">Bring in the data</a></li>
+<li><a href="#importing-a-specific-worksheet-from-excel">Importing a specific worksheet from Excel</a></li>
+<li><a href="#importing-multiple-worksheets-from-excel">Importing multiple worksheets from Excel</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>In the last <a href="http://robstilson.rbind.io/post/getting-data-from-github-part-1/">post</a> we learned how to get data from GitHub. In this post I will introduce you to getting data from an Excel file that you have on your desktop. Remember from last time we saved a file called “Additional Data for Attrition Data Set_” that included a time stamp created by R. In my case, the full file name was “Additional Data for Attrition Data Set_09_09_2020.xlsx”. Let’s pull it back into R using the <code>readxl</code> package from the <code>tidyverse</code>. Before we begin, remember to get and load the necessary packages.</p>
+<div id="get-packages" class="section level2">
+<h2>Get Packages</h2>
+<p>If you’ve read my post before, this may be repetitive, but this code chunk will load the necessary packages for the analysis. I’ve been using <code>pacman</code> for years and I encourage you to check it out as well. The <code>tryCatch</code> portion of the code will check your machine to see if <code>pacman</code> has already been installed. If it finds <code>pacman</code>, it will download it and if not it will move on. The <code>pacman::p_load</code> function is a wrapper for <code>library</code> and <code>require</code> and checks to see if the listed packages are installed. If they are not, it will attempt to install them from CRAN and/or any other repository in the <code>pacman</code> repository list (See <em>Description</em> under <code>?p_load</code> for additional information).</p>
+<p>As a best practice, I also like to give a brief snippet of what each of the packages I’m loading will do in the analysis. This is helpful for anybody else who I send my code to, but also for myself if I need to come back to the code 6 months or more down the line.</p>
+</div>
+<div id="load-packages" class="section level2">
+<h2>Load packages</h2>
+<p>Here I’m explicitly calling the packages via <code>library</code>. Notice that <code>tidylog</code> is at the very end. This is necessary to load after <code>dplyr</code> so that all of the functions from <code>tidylog</code> work correctly. This is used in conjunction with the <code>conflicted</code> package. You can read more about it <a href="https://github.com/elbersb/tidylog/blob/master/README.md">here</a>.</p>
+<pre class="r"><code>conflict_prefer(&quot;filter&quot;, &quot;dplyr&quot;)</code></pre>
+<pre><code>## [conflicted] Removing existing preference</code></pre>
+<pre><code>## [conflicted] Will prefer dplyr::filter over any other package</code></pre>
+</div>
+<div id="bring-in-the-data" class="section level2">
+<h2>Bring in the data</h2>
+<p>Now we will load the data from our desktop. You will need to change the directory to reflect where you stored the file. We will call the data <code>df</code>, which is short for data frame.</p>
+<pre class="r"><code>library(readxl)
+df &lt;- read_excel(&quot;D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx&quot;)</code></pre>
+<p>Ok, what happened? You should now see the <code>df</code> object in your Global Environment, but where is the rest of the data? We had 8 individual tabs and it looks like it only took the first one, <code>accident</code>. What if we wanted the <code>performance</code> tab instead?</p>
+</div>
+<div id="importing-a-specific-worksheet-from-excel" class="section level2">
+<h2>Importing a specific worksheet from Excel</h2>
+<p>In order to do that we need to specify the sheet as follows:</p>
+<pre class="r"><code>library(readxl)
+performance &lt;- read_excel(&quot;D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx&quot;, sheet = &quot;performance&quot;)</code></pre>
+<p>Now we have the <code>performance</code> data in our Global Environment. We could do this 8 times for each of the sheets, but is there a better way?</p>
+</div>
+<div id="importing-multiple-worksheets-from-excel" class="section level2">
+<h2>Importing multiple worksheets from Excel</h2>
+<p>This portion is from <a href="https://rpubs.com/tf_peterson/readxl_import">Todd Peterson’s RPubs site</a> where he shows you how to import multiple worksheets using the <code>lapply</code> function.</p>
+<p>First, we will save our path as a variable. This is convenient so that we don’t have to write out the path name each time.</p>
+<pre class="r"><code>xl_data &lt;- &quot;D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx&quot;</code></pre>
+<p>Now we can feed our <code>xl_data</code> containing the path into the <code>excel_sheets</code> function from <code>readxl</code>.</p>
+<pre class="r"><code>tab_names &lt;- excel_sheets(path = xl_data)</code></pre>
+<p><code>tab_names</code> should appear in your Global Environment under values with the 8 tab names:</p>
+<ul>
+<li>accident</li>
+<li>fair_pay</li>
+<li>hr<br />
+</li>
+<li>hr_2<br />
+</li>
+<li>performance</li>
+<li>recruitment</li>
+<li>survey<br />
+</li>
+<li>survey_2</li>
+</ul>
+<p>We can see all of the names more easily by simply running <code>tab_names</code>.</p>
+<pre class="r"><code>tab_names</code></pre>
+<pre><code>## [1] &quot;accident&quot;    &quot;fair_pay&quot;    &quot;hr&quot;          &quot;hr_2&quot;        &quot;performance&quot;
+## [6] &quot;recruitment&quot; &quot;survey&quot;      &quot;survey_2&quot;</code></pre>
+<p>If you wanted to remove the quotation marks, you could wrap <code>tab_names</code> in the <code>cat()</code> function.</p>
+<pre class="r"><code>cat(tab_names)</code></pre>
+<pre><code>## accident fair_pay hr hr_2 performance recruitment survey survey_2</code></pre>
+<p>Let’s say the data you are working with has a large number of tabs. You could wrap <code>tab_names</code> in <code>cat()</code> and use a separator in order to see them all in a vertical fashion.</p>
+<pre class="r"><code>cat(tab_names, sep = &quot;\n&quot;)</code></pre>
+<pre><code>## accident
+## fair_pay
+## hr
+## hr_2
+## performance
+## recruitment
+## survey
+## survey_2</code></pre>
+<p>The <code>"\n"</code> in the previous code signifies a line break.</p>
+<p>You can also place additional characters, like a comma, before the slash to have a vertical list with a comma at the end.</p>
+<pre class="r"><code>cat(tab_names, sep = &quot;,\n&quot;)</code></pre>
+<pre><code>## accident,
+## fair_pay,
+## hr,
+## hr_2,
+## performance,
+## recruitment,
+## survey,
+## survey_2</code></pre>
+<p>Ok, back to actually importing the data. Again, we will use the <code>lapply</code> function which you can read more about <a href="https://petewerner.blogspot.com/2012/12/using-apply-sapply-lapply-in-r.html">here</a> in the famous “Using apply, sapply, lapply in R” blog post.</p>
+<pre class="r"><code>tab_names &lt;- excel_sheets(path = xl_data)
+
+list_all &lt;- lapply(tab_names, function(x) read_excel(path = xl_data, sheet = x))
+
+str(list_all)</code></pre>
+<pre><code>## List of 8
+##  $ : tibble [302 x 3] (S3: tbl_df/tbl/data.frame)
+##   ..$ year         : num [1:302] 2017 2017 2017 2017 2017 ...
+##   ..$ employee_id  : num [1:302] 1 4 11 19 22 23 24 38 41 47 ...
+##   ..$ accident_type: chr [1:302] &quot;Mild&quot; &quot;Mild&quot; &quot;Mild&quot; &quot;Mild&quot; ...
+##  $ : tibble [1,470 x 5] (S3: tbl_df/tbl/data.frame)
+##   ..$ employee_id: num [1:1470] 1 2 4 5 7 8 10 11 12 13 ...
+##   ..$ department : chr [1:1470] &quot;Sales&quot; &quot;Engineering&quot; &quot;Engineering&quot; &quot;Engineering&quot; ...
+##   ..$ salary     : num [1:1470] 103264 80709 60737 99116 51022 ...
+##   ..$ new_hire   : chr [1:1470] &quot;No&quot; &quot;No&quot; &quot;Yes&quot; &quot;Yes&quot; ...
+##   ..$ job_level  : chr [1:1470] &quot;Salaried&quot; &quot;Hourly&quot; &quot;Hourly&quot; &quot;Salaried&quot; ...
+##  $ : tibble [1,470 x 4] (S3: tbl_df/tbl/data.frame)
+##   ..$ employee_id: num [1:1470] 1 2 4 5 7 8 10 11 12 13 ...
+##   ..$ department : chr [1:1470] &quot;Sales&quot; &quot;Engineering&quot; &quot;Engineering&quot; &quot;Engineering&quot; ...
+##   ..$ job_level  : chr [1:1470] &quot;Salaried&quot; &quot;Hourly&quot; &quot;Hourly&quot; &quot;Salaried&quot; ...
+##   ..$ gender     : chr [1:1470] &quot;Female&quot; &quot;Female&quot; &quot;Female&quot; &quot;Male&quot; ...
+##  $ : tibble [2,940 x 4] (S3: tbl_df/tbl/data.frame)
+##   ..$ year          : num [1:2940] 2016 2017 2016 2017 2016 ...
+##   ..$ employee_id   : num [1:2940] 1 1 2 2 4 4 5 5 7 7 ...
+##   ..$ location      : chr [1:2940] &quot;Northwood&quot; &quot;Northwood&quot; &quot;East Valley&quot; &quot;East Valley&quot; ...
+##   ..$ overtime_hours: num [1:2940] 14 8 8 11 4 2 0 17 21 9 ...
+##  $ : tibble [1,470 x 2] (S3: tbl_df/tbl/data.frame)
+##   ..$ employee_id: num [1:1470] 1 2 4 5 7 8 10 11 12 13 ...
+##   ..$ rating     : num [1:1470] 4 4 4 4 2 5 3 4 3 3 ...
+##  $ : tibble [446 x 4] (S3: tbl_df/tbl/data.frame)
+##   ..$ attrition         : num [1:446] 1 0 1 0 0 1 1 0 0 0 ...
+##   ..$ performance_rating: num [1:446] 3 3 2 2 3 3 3 2 3 3 ...
+##   ..$ sales_quota_pct   : num [1:446] 1.088 2.394 0.498 2.514 1.425 ...
+##   ..$ recruiting_source : chr [1:446] &quot;Applied Online&quot; NA &quot;Campus&quot; NA ...
+##  $ : tibble [1,470 x 5] (S3: tbl_df/tbl/data.frame)
+##   ..$ employee_id        : num [1:1470] 1 2 4 5 7 8 10 11 12 13 ...
+##   ..$ department         : chr [1:1470] &quot;Sales&quot; &quot;Engineering&quot; &quot;Engineering&quot; &quot;Engineering&quot; ...
+##   ..$ engagement         : num [1:1470] 3 3 3 3 3 3 3 1 4 2 ...
+##   ..$ salary             : num [1:1470] 103264 80709 60737 99116 51022 ...
+##   ..$ vacation_days_taken: num [1:1470] 7 12 12 7 18 9 18 4 12 14 ...
+##  $ : tibble [2,940 x 3] (S3: tbl_df/tbl/data.frame)
+##   ..$ year       : num [1:2940] 2016 2017 2016 2017 2016 ...
+##   ..$ employee_id: num [1:2940] 1 1 2 2 4 4 5 5 7 7 ...
+##   ..$ engagement : num [1:2940] 3 3 3 3 3 3 3 3 3 3 ...</code></pre>
+<p>Admittedly, I stumbled during this next step. I wanted to get all of the individual data frames back into the environment as they were when we originally pulled them from GitHub. We’ve got the list now with <code>list_all</code>, but how do we actually access the dfs within? <a href="https://stackoverflow.com/questions/49359587/import-excel-workbook-with-multiple-sheets">Stackoverflow</a> to rescue! The linked post lays out exactly what I wanted to do and we will use that code below.</p>
+<p>Name all of the data frames using our <code>tab_names</code> object.</p>
+<pre class="r"><code>names(list_all) &lt;- tab_names</code></pre>
+<p>Then use the until now unknown to me function of <code>list2env</code> to put them all in the Global Environment. Viola!</p>
+<pre class="r"><code>list2env(list_all, .GlobalEnv)</code></pre>
+<pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
+</div>
+</div>
