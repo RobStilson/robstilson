@@ -33,7 +33,7 @@ If you've read my post before, this may be repetitive, but this code chunk will 
 
 As a best practice, I also like to give a brief snippet of what each of the packages I'm loading will do in the analysis. This is helpful for anybody else who I send my code to, but also for myself if I need to come back to the code 6 months or more down the line.
 
-```{r load packages, echo = FALSE, include= FALSE, warning = FALSE, message = FALSE}
+```{r load packages, echo = FALSE, include = TRUE, warning = FALSE, message = FALSE}
 #' <!-- ####################################################################################################### -->
 #' <!-- ####################################################################################################### -->
 #' <!-- ##################################LOADING PACKAGES##################################################### -->
@@ -71,7 +71,7 @@ pacman::p_load(modeldata, # data sets useful for modeling packages
 
 Here I'm explicitly calling the packages via `library`. Notice that `tidylog` is at the very end. This is necessary to load after `dplyr` so that all of the functions from `tidylog` work correctly. This is used in conjunction with the `conflicted` package. You can read more about it [here](https://github.com/elbersb/tidylog/blob/master/README.md).
 
-```{r, echo = FALSE, include= FALSE, warning = FALSE, message = FALSE}
+```{r, echo = FALSE, include = TRUE, warning = FALSE, message = FALSE}
 
 #' <!-- #Loading libraries -->
 
