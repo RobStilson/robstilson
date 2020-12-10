@@ -84,9 +84,53 @@
       <description>
 
 
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;conflict_prefer(&amp;quot;filter&amp;quot;, &amp;quot;dplyr&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [conflicted] Removing existing preference&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [conflicted] Will prefer dplyr::filter over any other package&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Summary&lt;/h1&gt;
-&lt;p&gt;In the last &lt;a href=&#34;http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/&#34;&gt;post&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/&#34;&gt;Part 2&lt;/a&gt;, we covered loading Excel data from you local machine into R. Now we will cover how to join all of that data together into one worksheet.&lt;/p&gt;
+&lt;div id=&#34;bring-in-the-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Bring in the data&lt;/h2&gt;
+&lt;p&gt;If you haven’t look at &lt;a href=&#34;http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/&#34;&gt;Part 2&lt;/a&gt; yet, please go there now in order to get the various worksheets we are going to use directly onto your machine.&lt;/p&gt;
+&lt;p&gt;Now we will load the data from our desktop. You will need to change the directory to reflect where you stored the file. We will call the data &lt;code&gt;df&lt;/code&gt;, which is short for data frame.&lt;/p&gt;
+&lt;p&gt;Remember the sheets were:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;accident&lt;/li&gt;
+&lt;li&gt;fair_pay&lt;/li&gt;
+&lt;li&gt;hr&lt;br /&gt;
+&lt;/li&gt;
+&lt;li&gt;hr_2&lt;br /&gt;
+&lt;/li&gt;
+&lt;li&gt;performance&lt;/li&gt;
+&lt;li&gt;recruitment&lt;/li&gt;
+&lt;li&gt;survey&lt;br /&gt;
+&lt;/li&gt;
+&lt;li&gt;survey_2&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We will lump all the code necessary to get the worksheets onto our machine together and then get to joining them together.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;xl_data &amp;lt;- &amp;quot;D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx&amp;quot;
+
+tab_names &amp;lt;- excel_sheets(path = xl_data)
+
+list_all &amp;lt;- lapply(tab_names, function(x) read_excel(path = xl_data, sheet = x))
+
+names(list_all) &amp;lt;- tab_names
+
+list2env(list_all, .GlobalEnv)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## &amp;lt;environment: R_GlobalEnv&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In your Global Environment, you should see the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;8 dfs that we just uploaded&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;1 “List of 8”&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;2 Values&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;tab_names&lt;/li&gt;
+&lt;li&gt;xl_data&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We’re going to join all of the data from the 8 worksheets together into one larger worksheet that we will call &lt;code&gt;df&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 </description>
     </item>

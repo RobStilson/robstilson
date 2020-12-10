@@ -30,8 +30,7 @@
   
     
   
-  <meta name="description" content="SummaryIn the last post
-">
+  <meta name="description" content="conflict_prefer(&quot;filter&quot;, &quot;dplyr&quot;)## [conflicted] Removing existing preference## [conflicted] Will prefer dplyr::filter over any other packageSummaryIn the Part 2, we covered loading Excel data from you local machine into R.">
 
   
   <link rel="alternate" hreflang="en-us" href="http://robstilson.rbind.io/post/working-with-data-part-3-joining-worksheets-together/">
@@ -253,8 +252,7 @@
   <meta property="og:site_name" content="Website of Rob Stilson">
   <meta property="og:url" content="http://robstilson.rbind.io/post/working-with-data-part-3-joining-worksheets-together/">
   <meta property="og:title" content="Working with  Data-Part 3-Joining worksheets together | Website of Rob Stilson">
-  <meta property="og:description" content="SummaryIn the last post
-"><meta property="og:image" content="http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png">
+  <meta property="og:description" content="conflict_prefer(&quot;filter&quot;, &quot;dplyr&quot;)## [conflicted] Removing existing preference## [conflicted] Will prefer dplyr::filter over any other packageSummaryIn the Part 2, we covered loading Excel data from you local machine into R."><meta property="og:image" content="http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png">
   <meta property="twitter:image" content="http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="en-us">
   
     
@@ -304,7 +302,7 @@
       "url": "http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png"
     }
   },
-  "description": "\rSummary\rIn the last post\n\r"
+  "description": "conflict_prefer(\u0026quot;filter\u0026quot;, \u0026quot;dplyr\u0026quot;)\r## [conflicted] Removing existing preference\r## [conflicted] Will prefer dplyr::filter over any other package\rSummary\rIn the Part 2, we covered loading Excel data from you local machine into R."
 }
 </script>
 
@@ -554,7 +552,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    1 min read
+    2 min read
   </span>
   
 
@@ -598,9 +596,53 @@
                 
 
 
+<pre class="r"><code>conflict_prefer(&quot;filter&quot;, &quot;dplyr&quot;)</code></pre>
+<pre><code>## [conflicted] Removing existing preference</code></pre>
+<pre><code>## [conflicted] Will prefer dplyr::filter over any other package</code></pre>
 <div id="summary" class="section level1">
 <h1>Summary</h1>
-<p>In the last <a href="http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/">post</a></p>
+<p>In the <a href="http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/">Part 2</a>, we covered loading Excel data from you local machine into R. Now we will cover how to join all of that data together into one worksheet.</p>
+<div id="bring-in-the-data" class="section level2">
+<h2>Bring in the data</h2>
+<p>If you haven’t look at <a href="http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/">Part 2</a> yet, please go there now in order to get the various worksheets we are going to use directly onto your machine.</p>
+<p>Now we will load the data from our desktop. You will need to change the directory to reflect where you stored the file. We will call the data <code>df</code>, which is short for data frame.</p>
+<p>Remember the sheets were:</p>
+<ul>
+<li>accident</li>
+<li>fair_pay</li>
+<li>hr<br />
+</li>
+<li>hr_2<br />
+</li>
+<li>performance</li>
+<li>recruitment</li>
+<li>survey<br />
+</li>
+<li>survey_2</li>
+</ul>
+<p>We will lump all the code necessary to get the worksheets onto our machine together and then get to joining them together.</p>
+<pre class="r"><code>xl_data &lt;- &quot;D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx&quot;
+
+tab_names &lt;- excel_sheets(path = xl_data)
+
+list_all &lt;- lapply(tab_names, function(x) read_excel(path = xl_data, sheet = x))
+
+names(list_all) &lt;- tab_names
+
+list2env(list_all, .GlobalEnv)</code></pre>
+<pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
+<p>In your Global Environment, you should see the following:</p>
+<ul>
+<li><p>8 dfs that we just uploaded</p></li>
+<li><p>1 “List of 8”</p></li>
+<li><p>2 Values</p>
+<ul>
+<li>tab_names</li>
+<li>xl_data</li>
+</ul></li>
+</ul>
+<p>We’re going to join all of the data from the 8 worksheets together into one larger worksheet that we will call <code>df</code>.</p>
+</div>
 </div>
 
               </div>
