@@ -1,0 +1,23 @@
+---
+title: Working with  Data-Part 3-Joining worksheets together
+author: robstilson
+date: '2020-12-09'
+slug: working-with-data-part-3-joining-worksheets-together
+categories:
+  - Joins
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-12-09T19:33:20-05:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+# Summary
+
+In the last [post](http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/)
