@@ -25,7 +25,19 @@ output:
 
 In this post I will introduce you to getting data from existing GitHub sites. We will use data sets found on Dragana Pavolovic's [GitHub page under her Data_analysis repository](https://github.com/Dragana236/Data_analysis). I discovered this from one of her blog post and it accentuates the HR data from the IBM Watson Analytics Lab. 
 
-First in Part 1, we will download the data into Excel and save it for posterity using the `openxlsx` package. We will give each data frame its own tab or worksheet in Excel so that it is all in one place. Then, in Part 2 we will show how we upload the data to give you a feel for how you would could bring data into R from an Excel workbook that has multiple worksheets. In Part 3, we will join all of the worksheets together in R using joins from `dplyr`. Part 4, will consists of some additional EDA with all of the data joined together. We will focus on wide and tall data in Part 5 as we take the data from a single row per person to multiple rows per person as we tidy the data. Part 6 will show off some of the advantages of having your data in tall form. Part 7 will introduce the `ggplot2` package for data visualization.
+First in **Part 1**, we will download the data into Excel and save it for posterity using the `openxlsx` package. We will give each data frame its own tab or worksheet in Excel so that it is all in one place. 
+
+Then, in **Part 2** we will show how we upload the data to give you a feel for how you would could bring data into R from an Excel workbook that has multiple worksheets. 
+
+In **Part 3**, we will join all of the worksheets together in R using joins from `dplyr`. 
+
+**Part 4**, will consists of some additional EDA with all of the data joined together. 
+
+We will focus on wide and tall data in **Part 5** as we take the data from a single row per person to multiple rows per person as we tidy the data. 
+
+**Part 6** will show off some of the advantages of having your data in tall form. 
+
+**Part 7** will introduce the `ggplot2` package for data visualization.
 
 ## Get Packages
 
