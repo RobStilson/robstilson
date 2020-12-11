@@ -104,7 +104,7 @@ L &lt;- list_all
 tab &lt;- table(unlist(lapply(L, names)))
 names(tab[tab == length(L)])</code></pre>
 <pre><code>## character(0)</code></pre>
-<p>character(0). What does that mean? That means that no columns occurred across all of the dfs. You may be feeling despondent at this point, but don’t give up hope! There is magic in that second line <code>tab &lt;- table(unlist(lapply(L, names)))</code> as it will tells us which columns occur and how many times it happens.</p>
+<p><code>character(0)</code>. What does that mean? That means that no columns occurred across all of the dfs. You may be feeling despondent at this point, but don’t give up hope! There is magic in that second line <code>tab &lt;- table(unlist(lapply(L, names)))</code> as it will tell us which columns occur and how many times it happens.</p>
 <p>Let’s run the code again, but just the <code>table(unlist(lapply(L, names)))</code> portion to see what we get.</p>
 <pre class="r"><code>table(unlist(lapply(L, names)))</code></pre>
 <pre><code>## 
