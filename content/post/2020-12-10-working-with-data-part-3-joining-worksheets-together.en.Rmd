@@ -148,15 +148,23 @@ The original question was, "how do I find the common column (or columns) across 
 But I found a bit of a work around. If we take the original solution to the question asked, we will assign our `list_all` that we used to get the tab names from our worksheet and pull all of the data in to `L` (but it could be any letter or name you choose).
 
 Then, we will combine the following:
+
 * `table` - `table` uses the cross-classifying factors to build a contingency table of the counts at each combination of factor levels.
+
 * `unlist` - Given a list structure x, `unlist` simplifies it to produce a vector which contains all the atomic components which occur in x.
+
 * `lapply` - `lapply` returns a list of the same length as X, each element of which is the result of applying FUN to the corresponding element of X.
+
 * `names` - Functions to get or set the names of an object.
 
 So the code `tab <- table(unlist(lapply(L, names)))` is doing the following:
+
 1. Looks for the columns names within `L` or whatever you assigned `list_all` to
+
 2. `unlist` all of them via `lapply`
+
 3. Creates a `table` of the column names across all of the dfs in `L` and tallies up how many times they occurred
+
 4. Assigns them to the object `tab`
 
 Then, the final line of code, `names(tab[tab == length(L)])` looks for any `names` in the table `tab` that occur the same amount of times as the `length` of `L`, your list, which in this instance is 8.
@@ -189,7 +197,8 @@ table(unlist(lapply(L, names)))
   
 This is very useful information! We can see that `accident_type` showed up once across all 8 dfs, `salary` showed up twice and so forth, but the gem is that `employee_id` showed up 7 times. It is also great that `employee_id` happens to be a unique identifier so that is what we will use to merge 7 out of our 8 dfs together. 
 
-Here is where we jump the shark...I was wondering, well if I had 100 dfs and only 99 of them had the required column for merging...how would I know which one didn't. The brute force way is to simply go through each and every one of them and check, but that is not scalable nor conducive to a mistake free process. After searching a bit, I came across (this solution)[https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r] on Stackoverflow. We create a function to take a look into all the dfs in our list, `list_all` and return a logical if `employee_id` is or is not present. Notice that for `recruitment`, it list `FALSE`. Sure enough, if you look at the `recruitment` df, it does not contain our desired column.
+Here is where we jump the shark...I was wondering, well if I had 100 dfs and only 99 of them had the required column for merging...how would I know which one didn't. The brute force way is to simply go through each and every one of them and check, but that is not scalable nor conducive to a mistake free process. After searching a bit, I came across (
+[this solution](https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r) on Stackoverflow. We create a function to take a look into all the dfs in our list, `list_all` and return a logical if `employee_id` is or is not present. Notice that for `recruitment`, it list `FALSE`. Sure enough, if you look at the `recruitment` df, it does not contain our desired column.
 
 ```{r}
 #From: https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r

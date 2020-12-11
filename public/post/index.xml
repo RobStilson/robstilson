@@ -79,16 +79,20 @@ list2env(list_all, .GlobalEnv)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I found &lt;a href=&#34;https://stackoverflow.com/questions/52860105/how-to-find-common-variables-in-different-data-frames&#34;&gt;this&lt;/a&gt; excellent answer on Stackoverflow and wanted to include it in this write up as I think you may find additional uses for it.&lt;/p&gt;
 &lt;p&gt;The original question was, “how do I find the common column (or columns) across all of my dfs of interest so that I can then use those to join all of my data together?” It turns out this only works if you actually have a common column across all of your dfs. If &lt;code&gt;employee_id&lt;/code&gt; occurs in 99 out of 100 of the files you are trying to merge together, you are now in trouble, because the solutions I found won’t return anything it the column isn’t present in all 100 (or however many) dfs you have.&lt;/p&gt;
 &lt;p&gt;But I found a bit of a work around. If we take the original solution to the question asked, we will assign our &lt;code&gt;list_all&lt;/code&gt; that we used to get the tab names from our worksheet and pull all of the data in to &lt;code&gt;L&lt;/code&gt; (but it could be any letter or name you choose).&lt;/p&gt;
-&lt;p&gt;Then, we will combine the following:
-* &lt;code&gt;table&lt;/code&gt; - &lt;code&gt;table&lt;/code&gt; uses the cross-classifying factors to build a contingency table of the counts at each combination of factor levels.
-* &lt;code&gt;unlist&lt;/code&gt; - Given a list structure x, &lt;code&gt;unlist&lt;/code&gt; simplifies it to produce a vector which contains all the atomic components which occur in x.
-* &lt;code&gt;lapply&lt;/code&gt; - &lt;code&gt;lapply&lt;/code&gt; returns a list of the same length as X, each element of which is the result of applying FUN to the corresponding element of X.
-* &lt;code&gt;names&lt;/code&gt; - Functions to get or set the names of an object.&lt;/p&gt;
-&lt;p&gt;So the code &lt;code&gt;tab &amp;lt;- table(unlist(lapply(L, names)))&lt;/code&gt; is doing the following:
-1. Looks for the columns names within &lt;code&gt;L&lt;/code&gt; or whatever you assigned &lt;code&gt;list_all&lt;/code&gt; to
-2. &lt;code&gt;unlist&lt;/code&gt; all of them via &lt;code&gt;lapply&lt;/code&gt;
-3. Creates a &lt;code&gt;table&lt;/code&gt; of the column names across all of the dfs in &lt;code&gt;L&lt;/code&gt; and tallies up how many times they occurred
-4. Assigns them to the object &lt;code&gt;tab&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Then, we will combine the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;table&lt;/code&gt; - &lt;code&gt;table&lt;/code&gt; uses the cross-classifying factors to build a contingency table of the counts at each combination of factor levels.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;unlist&lt;/code&gt; - Given a list structure x, &lt;code&gt;unlist&lt;/code&gt; simplifies it to produce a vector which contains all the atomic components which occur in x.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;lapply&lt;/code&gt; - &lt;code&gt;lapply&lt;/code&gt; returns a list of the same length as X, each element of which is the result of applying FUN to the corresponding element of X.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;names&lt;/code&gt; - Functions to get or set the names of an object.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So the code &lt;code&gt;tab &amp;lt;- table(unlist(lapply(L, names)))&lt;/code&gt; is doing the following:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;p&gt;Looks for the columns names within &lt;code&gt;L&lt;/code&gt; or whatever you assigned &lt;code&gt;list_all&lt;/code&gt; to&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;unlist&lt;/code&gt; all of them via &lt;code&gt;lapply&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Creates a &lt;code&gt;table&lt;/code&gt; of the column names across all of the dfs in &lt;code&gt;L&lt;/code&gt; and tallies up how many times they occurred&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Assigns them to the object &lt;code&gt;tab&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
 &lt;p&gt;Then, the final line of code, &lt;code&gt;names(tab[tab == length(L)])&lt;/code&gt; looks for any &lt;code&gt;names&lt;/code&gt; in the table &lt;code&gt;tab&lt;/code&gt; that occur the same amount of times as the &lt;code&gt;length&lt;/code&gt; of &lt;code&gt;L&lt;/code&gt;, your list, which in this instance is 8.&lt;/p&gt;
 &lt;p&gt;If you are unfamiliar with any of the R functions above, I implore you to learn more about them as you will probably see them a lot.&lt;/p&gt;
 &lt;p&gt;Alright, what actually happens if we run the code?&lt;/p&gt;
@@ -118,7 +122,8 @@ names(tab[tab == length(L)])&lt;/code&gt;&lt;/pre&gt;
 &lt;!-- recruiting_source              salary     sales_quota_pct vacation_days_taken                year  --&gt;
 &lt;!--                 1                   2                   1                   1                   3  --&gt;&lt;/p&gt;
 &lt;p&gt;This is very useful information! We can see that &lt;code&gt;accident_type&lt;/code&gt; showed up once across all 8 dfs, &lt;code&gt;salary&lt;/code&gt; showed up twice and so forth, but the gem is that &lt;code&gt;employee_id&lt;/code&gt; showed up 7 times. It is also great that &lt;code&gt;employee_id&lt;/code&gt; happens to be a unique identifier so that is what we will use to merge 7 out of our 8 dfs together.&lt;/p&gt;
-&lt;p&gt;Here is where we jump the shark…I was wondering, well if I had 100 dfs and only 99 of them had the required column for merging…how would I know which one didn’t. The brute force way is to simply go through each and every one of them and check, but that is not scalable nor conducive to a mistake free process. After searching a bit, I came across (this solution)[&lt;a href=&#34;https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r&#34; class=&#34;uri&#34;&gt;https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r&lt;/a&gt;] on Stackoverflow. We create a function to take a look into all the dfs in our list, &lt;code&gt;list_all&lt;/code&gt; and return a logical if &lt;code&gt;employee_id&lt;/code&gt; is or is not present. Notice that for &lt;code&gt;recruitment&lt;/code&gt;, it list &lt;code&gt;FALSE&lt;/code&gt;. Sure enough, if you look at the &lt;code&gt;recruitment&lt;/code&gt; df, it does not contain our desired column.&lt;/p&gt;
+&lt;p&gt;Here is where we jump the shark…I was wondering, well if I had 100 dfs and only 99 of them had the required column for merging…how would I know which one didn’t. The brute force way is to simply go through each and every one of them and check, but that is not scalable nor conducive to a mistake free process. After searching a bit, I came across (
+&lt;a href=&#34;https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r&#34;&gt;this solution&lt;/a&gt; on Stackoverflow. We create a function to take a look into all the dfs in our list, &lt;code&gt;list_all&lt;/code&gt; and return a logical if &lt;code&gt;employee_id&lt;/code&gt; is or is not present. Notice that for &lt;code&gt;recruitment&lt;/code&gt;, it list &lt;code&gt;FALSE&lt;/code&gt;. Sure enough, if you look at the &lt;code&gt;recruitment&lt;/code&gt; df, it does not contain our desired column.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#From: https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r
 reqnames &amp;lt;- c(&amp;quot;employee_id&amp;quot;)
 lapply(list_all, function(x) any(names(x) %in% reqnames))&lt;/code&gt;&lt;/pre&gt;
