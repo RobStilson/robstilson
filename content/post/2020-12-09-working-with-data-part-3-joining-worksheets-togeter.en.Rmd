@@ -16,6 +16,9 @@ image:
   focal_point: ''
   preview_only: no
 projects: []
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 ```{r load packages, echo = FALSE, include= FALSE, warning = FALSE, message = FALSE}
@@ -81,7 +84,7 @@ for (f in getNamespaceExports("tidylog")) {
 
 ```
 
-```{r}
+```{r, echo = FALSE, include= FALSE, warning = FALSE, message = FALSE}
 conflict_prefer("filter", "dplyr")
 ```
 
@@ -131,4 +134,80 @@ In your Global Environment, you should see the following:
     - xl_data
     
 We're going to join all of the data from the 8 worksheets together into one larger worksheet that we will call `df`.
+
+## Determining what columns on which to join
+
+Originally, I thought this was going to be easy as I assumed (and we know what that does...) that across all 8 dfs, we had a variable that was common to all of them, but that turned out to not be the case. 
+
+So, we will work backwards and I'll tell you where we end up.
+
+I found [this](https://stackoverflow.com/questions/52860105/how-to-find-common-variables-in-different-data-frames) excellent answer on Stackoverflow and wanted to include it in this write up as I think you may find additional uses for it. 
+
+The original question was, "how do I find the common column (or columns) across all of my dfs of interest so that I can then use those to join all of my data together?" It turns out this only works if you actually have a common column across all of your dfs. If `employee_id` occurs in 99 out of 100 of the files you are trying to merge together, you are now in trouble, because the solutions I found won't return anything it the column isn't present in all 100 (or however many) dfs you have.
+
+But I found a bit of a work around. If we take the original solution to the question asked, we will assign our `list_all` that we used to get the tab names from our worksheet and pull all of the data in to `L` (but it could be any letter or name you choose).
+
+Then, we will combine the following:
+* `table` - `table` uses the cross-classifying factors to build a contingency table of the counts at each combination of factor levels.
+* `unlist` - Given a list structure x, `unlist` simplifies it to produce a vector which contains all the atomic components which occur in x.
+* `lapply` - `lapply` returns a list of the same length as X, each element of which is the result of applying FUN to the corresponding element of X.
+* `names` - Functions to get or set the names of an object.
+
+So the code `tab <- table(unlist(lapply(L, names)))` is doing the following:
+1. Looks for the columns names within `L` or whatever you assigned `list_all` to
+2. `unlist` all of them via `lapply`
+3. Creates a `table` of the column names across all of the dfs in `L` and tallies up how many times they occurred
+4. Assigns them to the object `tab`
+
+Then, the final line of code, `names(tab[tab == length(L)])` looks for any `names` in the table `tab` that occur the same amount of times as the `length` of `L`, your list, which in this instance is 8.
+
+If you are unfamiliar with any of the R functions above, I implore you to learn more about them as you will probably see them a lot.
+
+Alright, what actually happens if we run the code?
+
+```{r}
+#From: https://stackoverflow.com/questions/52860105/how-to-find-common-variables-in-different-data-frames
+L <- list_all
+tab <- table(unlist(lapply(L, names)))
+names(tab[tab == length(L)])
+```
+
+character(0). What does that mean? That means that no columns occurred across all of the dfs. You may be feeling despondent at this point, but don't give up hope! There is magic in that second line `tab <- table(unlist(lapply(L, names)))` as it will tells us which columns occur and how many times it happens.
+
+Let's run the code again, but just the `table(unlist(lapply(L, names)))` portion to see what we get.
+
+```{r}
+table(unlist(lapply(L, names)))
+```
+
+  <!--     accident_type           attrition          department         employee_id          engagement              gender  -->
+  <!--                 1                   1                   3                   7                   2                   1  -->
+  <!--         job_level            location            new_hire      overtime_hours  performance_rating              rating  -->
+  <!--                 2                   1                   1                   1                   1                   1  -->
+  <!-- recruiting_source              salary     sales_quota_pct vacation_days_taken                year  -->
+  <!--                 1                   2                   1                   1                   3  -->
+  
+This is very useful information! We can see that `accident_type` showed up once across all 8 dfs, `salary` showed up twice and so forth, but the gem is that `employee_id` showed up 7 times. It is also great that `employee_id` happens to be a unique identifier so that is what we will use to merge 7 out of our 8 dfs together. 
+
+Here is where we jump the shark...I was wondering, well if I had 100 dfs and only 99 of them had the required column for merging...how would I know which one didn't. The brute force way is to simply go through each and every one of them and check, but that is not scalable nor conducive to a mistake free process. After searching a bit, I came across (this solution)[https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r] on Stackoverflow. We create a function to take a look into all the dfs in our list, `list_all` and return a logical if `employee_id` is or is not present. Notice that for `recruitment`, it list `FALSE`. Sure enough, if you look at the `recruitment` df, it does not contain our desired column.
+
+```{r}
+#From: https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r
+reqnames <- c("employee_id")
+lapply(list_all, function(x) any(names(x) %in% reqnames))
+```
+If we count, we see that `recruitment` is the 6th df in the list. We can create a new list called `new_list` where we remove `recruitement` and then we can run it through our code from above.
+
+```{r}
+new_list <- list_all[-6]
+```
+
+```{r}
+L <- new_list
+tab <- table(unlist(lapply(L, names)))
+names(tab[tab == length(L)])
+```
+
+It now returns `employee_id`!
+
 

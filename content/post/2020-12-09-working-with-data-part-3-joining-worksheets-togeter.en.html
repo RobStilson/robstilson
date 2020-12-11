@@ -1,0 +1,159 @@
+---
+title: Working with Data-Part 3-Joining worksheets together
+author: robstilson
+date: '2020-12-09'
+slug: working-with-data-part-3-joining-worksheets-together
+categories:
+  - Joins
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-12-09T19:33:20-05:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#summary">Summary</a><ul>
+<li><a href="#bring-in-the-data">Bring in the data</a></li>
+<li><a href="#determining-what-columns-on-which-to-join">Determining what columns on which to join</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>In the <a href="http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/">Part 2</a>, we covered loading Excel data from you local machine into R. Now we will cover how to join all of that data together into one worksheet.</p>
+<div id="bring-in-the-data" class="section level2">
+<h2>Bring in the data</h2>
+<p>If you haven’t look at <a href="http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/">Part 2</a> yet, please go there now in order to get the various worksheets we are going to use directly onto your machine.</p>
+<p>Now we will load the data from our desktop. You will need to change the directory to reflect where you stored the file. We will call the data <code>df</code>, which is short for data frame.</p>
+<p>Remember the sheets were:</p>
+<ul>
+<li>accident</li>
+<li>fair_pay</li>
+<li>hr<br />
+</li>
+<li>hr_2<br />
+</li>
+<li>performance</li>
+<li>recruitment</li>
+<li>survey<br />
+</li>
+<li>survey_2</li>
+</ul>
+<p>We will lump all the code necessary to get the worksheets onto our machine together and then get to joining them together.</p>
+<pre class="r"><code>xl_data &lt;- &quot;D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx&quot;
+
+tab_names &lt;- excel_sheets(path = xl_data)
+
+list_all &lt;- lapply(tab_names, function(x) read_excel(path = xl_data, sheet = x))
+
+names(list_all) &lt;- tab_names
+
+list2env(list_all, .GlobalEnv)</code></pre>
+<pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
+<p>In your Global Environment, you should see the following:</p>
+<ul>
+<li><p>8 dfs that we just uploaded</p></li>
+<li><p>1 “List of 8”</p></li>
+<li><p>2 Values</p>
+<ul>
+<li>tab_names</li>
+<li>xl_data</li>
+</ul></li>
+</ul>
+<p>We’re going to join all of the data from the 8 worksheets together into one larger worksheet that we will call <code>df</code>.</p>
+</div>
+<div id="determining-what-columns-on-which-to-join" class="section level2">
+<h2>Determining what columns on which to join</h2>
+<p>Originally, I thought this was going to be easy as I assumed (and we know what that does…) that across all 8 dfs, we had a variable that was common to all of them, but that turned out to not be the case.</p>
+<p>So, we will work backwards and I’ll tell you where we end up.</p>
+<p>I found <a href="https://stackoverflow.com/questions/52860105/how-to-find-common-variables-in-different-data-frames">this</a> excellent answer on Stackoverflow and wanted to include it in this write up as I think you may find additional uses for it.</p>
+<p>The original question was, “how do I find the common column (or columns) across all of my dfs of interest so that I can then use those to join all of my data together?” It turns out this only works if you actually have a common column across all of your dfs. If <code>employee_id</code> occurs in 99 out of 100 of the files you are trying to merge together, you are now in trouble, because the solutions I found won’t return anything it the column isn’t present in all 100 (or however many) dfs you have.</p>
+<p>But I found a bit of a work around. If we take the original solution to the question asked, we will assign our <code>list_all</code> that we used to get the tab names from our worksheet and pull all of the data in to <code>L</code> (but it could be any letter or name you choose).</p>
+<p>Then, we will combine the following:
+* <code>table</code> - <code>table</code> uses the cross-classifying factors to build a contingency table of the counts at each combination of factor levels.
+* <code>unlist</code> - Given a list structure x, <code>unlist</code> simplifies it to produce a vector which contains all the atomic components which occur in x.
+* <code>lapply</code> - <code>lapply</code> returns a list of the same length as X, each element of which is the result of applying FUN to the corresponding element of X.
+* <code>names</code> - Functions to get or set the names of an object.</p>
+<p>So the code <code>tab &lt;- table(unlist(lapply(L, names)))</code> is doing the following:
+1. Looks for the columns names within <code>L</code> or whatever you assigned <code>list_all</code> to
+2. <code>unlist</code> all of them via <code>lapply</code>
+3. Creates a <code>table</code> of the column names across all of the dfs in <code>L</code> and tallies up how many times they occurred
+4. Assigns them to the object <code>tab</code></p>
+<p>Then, the final line of code, <code>names(tab[tab == length(L)])</code> looks for any <code>names</code> in the table <code>tab</code> that occur the same amount of times as the <code>length</code> of <code>L</code>, your list, which in this instance is 8.</p>
+<p>If you are unfamiliar with any of the R functions above, I implore you to learn more about them as you will probably see them a lot.</p>
+<p>Alright, what actually happens if we run the code?</p>
+<pre class="r"><code>#From: https://stackoverflow.com/questions/52860105/how-to-find-common-variables-in-different-data-frames
+L &lt;- list_all
+tab &lt;- table(unlist(lapply(L, names)))
+names(tab[tab == length(L)])</code></pre>
+<pre><code>## character(0)</code></pre>
+<p>character(0). What does that mean? That means that no columns occurred across all of the dfs. You may be feeling despondent at this point, but don’t give up hope! There is magic in that second line <code>tab &lt;- table(unlist(lapply(L, names)))</code> as it will tells us which columns occur and how many times it happens.</p>
+<p>Let’s run the code again, but just the <code>table(unlist(lapply(L, names)))</code> portion to see what we get.</p>
+<pre class="r"><code>table(unlist(lapply(L, names)))</code></pre>
+<pre><code>## 
+##       accident_type           attrition          department         employee_id 
+##                   1                   1                   3                   7 
+##          engagement              gender           job_level            location 
+##                   2                   1                   2                   1 
+##            new_hire      overtime_hours  performance_rating              rating 
+##                   1                   1                   1                   1 
+##   recruiting_source              salary     sales_quota_pct vacation_days_taken 
+##                   1                   2                   1                   1 
+##                year 
+##                   3</code></pre>
+<p><!--     accident_type           attrition          department         employee_id          engagement              gender  -->
+<!--                 1                   1                   3                   7                   2                   1  -->
+<!--         job_level            location            new_hire      overtime_hours  performance_rating              rating  -->
+<!--                 2                   1                   1                   1                   1                   1  -->
+<!-- recruiting_source              salary     sales_quota_pct vacation_days_taken                year  -->
+<!--                 1                   2                   1                   1                   3  --></p>
+<p>This is very useful information! We can see that <code>accident_type</code> showed up once across all 8 dfs, <code>salary</code> showed up twice and so forth, but the gem is that <code>employee_id</code> showed up 7 times. It is also great that <code>employee_id</code> happens to be a unique identifier so that is what we will use to merge 7 out of our 8 dfs together.</p>
+<p>Here is where we jump the shark…I was wondering, well if I had 100 dfs and only 99 of them had the required column for merging…how would I know which one didn’t. The brute force way is to simply go through each and every one of them and check, but that is not scalable nor conducive to a mistake free process. After searching a bit, I came across (this solution)[<a href="https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r" class="uri">https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r</a>] on Stackoverflow. We create a function to take a look into all the dfs in our list, <code>list_all</code> and return a logical if <code>employee_id</code> is or is not present. Notice that for <code>recruitment</code>, it list <code>FALSE</code>. Sure enough, if you look at the <code>recruitment</code> df, it does not contain our desired column.</p>
+<pre class="r"><code>#From: https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r
+reqnames &lt;- c(&quot;employee_id&quot;)
+lapply(list_all, function(x) any(names(x) %in% reqnames))</code></pre>
+<pre><code>## $accident
+## [1] TRUE
+## 
+## $fair_pay
+## [1] TRUE
+## 
+## $hr
+## [1] TRUE
+## 
+## $hr_2
+## [1] TRUE
+## 
+## $performance
+## [1] TRUE
+## 
+## $recruitment
+## [1] FALSE
+## 
+## $survey
+## [1] TRUE
+## 
+## $survey_2
+## [1] TRUE</code></pre>
+<p>If we count, we see that <code>recruitment</code> is the 6th df in the list. We can create a new list called <code>new_list</code> where we remove <code>recruitement</code> and then we can run it through our code from above.</p>
+<pre class="r"><code>new_list &lt;- list_all[-6]</code></pre>
+<pre class="r"><code>L &lt;- new_list
+tab &lt;- table(unlist(lapply(L, names)))
+names(tab[tab == length(L)])</code></pre>
+<pre><code>## [1] &quot;employee_id&quot;</code></pre>
+<p>It now returns <code>employee_id</code>!</p>
+</div>
+</div>
