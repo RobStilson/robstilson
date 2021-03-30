@@ -219,6 +219,188 @@ names(tab[tab == length(L)])
 
 It now returns `employee_id`!
 
+Ok, now that we have gone through all of that, let's join the 7 sheets that contain `employee_id` together. Again, we could do this one at a time, but there is a much easier and quicker way. Will will call this df `Extra_Data` since we are going to join it with our main attrition data.
 
 
+```{r}
+Extra_Data <- list(accident, #year
+fair_pay,
+hr,         
+hr_2, #year       
+performance, 
+survey,      
+survey_2) %>% # year
+  reduce(left_join, by = c("employee_id"))
+```
 
+Now if we take a look at the new df, we see that some columns were duplicated and recieved a `.x` or `.y`. This is due to R not being able to handle multiple columns in the same df with the same name (which makes sense). There may be a more straigth forward way to deal with this, but we are simply going to look at all the column names and then only select the original ones and then rename them to remove the suffix.
+
+```{r}
+head(Extra_Data)
+```
+```{r}
+cat(colnames(Extra_Data), sep = ",\n")
+```
+
+```{r}
+Extra_Data <- Extra_Data %>%
+  select(year.x,
+         employee_id,
+         accident_type,
+         department.x,
+         salary.x,
+         new_hire,
+         job_level.x,
+         # department.y,
+         # job_level.y,
+         gender,
+         # year.y,
+         location,
+         overtime_hours,
+         rating,
+         department,
+         engagement.x,
+         # salary.y,
+         vacation_days_taken,
+         year
+         # engagement.y
+         )
+```
+
+Notice in this code that everything with the suffix `.y` has gotten the CTRL + SHIFT + c treatment and been commented out.
+
+```{r}
+head(Extra_Data)
+```
+
+And now we are still having a problem with `department` and it looks like `year` may have gotten mixed up as well. We may have to do this in layers after all.
+
+First we will gather all of the extra data that contains `year`.
+
+```{r}
+Extra_Data_year <- list(accident, #year
+hr_2, #year       
+survey_2) %>% # year
+  reduce(full_join, by = c("employee_id", "year")) #Notice we are doing a full_join instead of a left_join since we want to get all of the data and we know that someone may have had an accident one year but not another year.
+```
+
+```{r}
+head(Extra_Data_year)
+```
+That is looking clean. Now we will use all of the data that has `department`.
+
+```{r}
+Extra_Data_dept <- list(fair_pay,
+hr,         
+survey) %>% 
+  reduce(left_join, by = c("employee_id", "department"))
+```
+
+```{r}
+head(Extra_Data_dept)
+```
+We've got some duplicates here. Let's just make sure they are the same before we eliminate one.
+
+```{r}
+Extra_Data_dupe <- Extra_Data_dept %>%
+  mutate(sal_same = salary.x == salary.y, #This will create a logical TRUE/FALSE We hope to see all TRUE for both
+         job_same = job_level.x == job_level.y) %>%
+  select(employee_id,
+         sal_same,
+         job_same)
+
+summary(Extra_Data_dupe)
+```
+
+The summary is telling us that we have 16 `FALSE` where they don't match. Let's find them and take a look.
+
+```{r}
+sal_false <- Extra_Data_dupe %>%
+  filter(sal_same == FALSE)
+```
+
+Now let's filter `Extra_Data_dept` using `sal_false` to bring out the 16 we want to take a look at.
+
+```{r}
+sal_look <- Extra_Data_dept %>%
+  filter(employee_id %in% sal_false$employee_id)
+```
+
+They are definitely different. In this case, we will default to the value given in the `fair_pay` data, but in a real situation we would reach out to the appropriate SME in order to determine the correct course of action. If for whatever reason, that is not possible, remember, document, document, document!!!! This will help future you and anybody else who encounters your code.
+
+```{r}
+Extra_Data_dept <- Extra_Data_dept %>%
+  select(employee_id,
+         department,
+         salary.x, # Using salary.x instead of .y due to inclusion in `fair_pay` data, but check on this
+         new_hire,
+         job_level.x,
+         # job_level.y,
+         gender,
+         engagement,
+         # salary.y,
+         vacation_days_taken) %>%
+  rename(salary = salary.x,
+         job_level = job_level.x)
+
+colnames(Extra_Data_dept)
+```
+The names look good now.
+
+We'll merge together `Extra_Data_year` with `Extra_Data_dept`.
+
+Before we join `Extra_Data_year`, let's make it wide_data instead of tall_data with `pivot_wider`.
+
+```{r}
+Extra_Data_year_cast <- Extra_Data_year %>%
+  pivot_wider(names_from = year,
+              values_from = c(accident_type,
+                              overtime_hours,
+                              engagement))
+```
+
+
+```{r}
+Extra_Data_year_dept <- Extra_Data_dept %>%
+  left_join(Extra_Data_year_cast, by = "employee_id")
+```
+
+Finally, we will join the `Extra_Data_year_dept` data with `performance` before the final join with the main data.
+
+```{r}
+Extra_Data <- Extra_Data_year_dept %>%
+  left_join(performance, by = "employee_id")
+```
+Load the original data.
+
+```{r}
+library(modeldata)
+
+data(attrition)
+
+Data <- attrition
+```
+
+```{r}
+library(readr)
+Data <- read_csv("D:/Blog/WA_Fn-UseC_-HR-Employee-Attrition.csv")
+```
+
+
+`left_join` with the `Extra_Data` we just created.
+
+```{r}
+Data <- Data %>%
+  left_join(Extra_Data, by = c("EmployeeNumber" = "employee_id"))
+```
+
+
+# Wrap up
+We consolidated all of the extra data frames into one and then merged them with our original dataframe.
+
+# Just the code
+
+
+```{r ref.label = knitr::all_labels(), echo = TRUE, eval = FALSE}
+
+```
