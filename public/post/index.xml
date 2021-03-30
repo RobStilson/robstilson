@@ -5,162 +5,12 @@
     <link>http://robstilson.rbind.io/post/</link>
       <atom:link href="http://robstilson.rbind.io/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Wed, 09 Dec 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 17 Sep 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Posts</title>
       <link>http://robstilson.rbind.io/post/</link>
     </image>
-    
-    <item>
-      <title>Working with Data-Part 3-Joining worksheets together</title>
-      <link>http://robstilson.rbind.io/post/working-with-data-part-3-joining-worksheets-together/</link>
-      <pubDate>Wed, 09 Dec 2020 00:00:00 +0000</pubDate>
-      <guid>http://robstilson.rbind.io/post/working-with-data-part-3-joining-worksheets-together/</guid>
-      <description>
-
-&lt;div id=&#34;TOC&#34;&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#bring-in-the-data&#34;&gt;Bring in the data&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#determining-what-columns-on-which-to-join&#34;&gt;Determining what columns on which to join&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-
-&lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Summary&lt;/h1&gt;
-&lt;p&gt;In the &lt;a href=&#34;http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/&#34;&gt;Part 2&lt;/a&gt;, we covered loading Excel data from you local machine into R. Now we will cover how to join all of that data together into one worksheet.&lt;/p&gt;
-&lt;div id=&#34;bring-in-the-data&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Bring in the data&lt;/h2&gt;
-&lt;p&gt;If you haven’t look at &lt;a href=&#34;http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/&#34;&gt;Part 2&lt;/a&gt; yet, please go there now in order to get the various worksheets we are going to use directly onto your machine.&lt;/p&gt;
-&lt;p&gt;Now we will load the data from our desktop. You will need to change the directory to reflect where you stored the file. We will call the data &lt;code&gt;df&lt;/code&gt;, which is short for data frame.&lt;/p&gt;
-&lt;p&gt;Remember the sheets were:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;accident&lt;/li&gt;
-&lt;li&gt;fair_pay&lt;/li&gt;
-&lt;li&gt;hr&lt;br /&gt;
-&lt;/li&gt;
-&lt;li&gt;hr_2&lt;br /&gt;
-&lt;/li&gt;
-&lt;li&gt;performance&lt;/li&gt;
-&lt;li&gt;recruitment&lt;/li&gt;
-&lt;li&gt;survey&lt;br /&gt;
-&lt;/li&gt;
-&lt;li&gt;survey_2&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;We will lump all the code necessary to get the worksheets onto our machine together and then get to joining them together.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;xl_data &amp;lt;- &amp;quot;D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx&amp;quot;
-
-tab_names &amp;lt;- excel_sheets(path = xl_data)
-
-list_all &amp;lt;- lapply(tab_names, function(x) read_excel(path = xl_data, sheet = x))
-
-names(list_all) &amp;lt;- tab_names
-
-list2env(list_all, .GlobalEnv)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## &amp;lt;environment: R_GlobalEnv&amp;gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;In your Global Environment, you should see the following:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;8 dfs that we just uploaded&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;1 “List of 8”&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;2 Values&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;tab_names&lt;/li&gt;
-&lt;li&gt;xl_data&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;We’re going to join all of the data from the 8 worksheets together into one larger worksheet that we will call &lt;code&gt;df&lt;/code&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;determining-what-columns-on-which-to-join&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Determining what columns on which to join&lt;/h2&gt;
-&lt;p&gt;Originally, I thought this was going to be easy as I assumed (and we know what that does…) that across all 8 dfs, we had a variable that was common to all of them, but that turned out to not be the case.&lt;/p&gt;
-&lt;p&gt;So, we will work backwards and I’ll tell you where we end up.&lt;/p&gt;
-&lt;p&gt;I found &lt;a href=&#34;https://stackoverflow.com/questions/52860105/how-to-find-common-variables-in-different-data-frames&#34;&gt;this&lt;/a&gt; excellent answer on Stackoverflow and wanted to include it in this write up as I think you may find additional uses for it.&lt;/p&gt;
-&lt;p&gt;The original question was, “how do I find the common column (or columns) across all of my dfs of interest so that I can then use those to join all of my data together?” It turns out this only works if you actually have a common column across all of your dfs. If &lt;code&gt;employee_id&lt;/code&gt; occurs in 99 out of 100 of the files you are trying to merge together, you are now in trouble, because the solutions I found won’t return anything it the column isn’t present in all 100 (or however many) dfs you have.&lt;/p&gt;
-&lt;p&gt;But I found a bit of a work around. If we take the original solution to the question asked, we will assign our &lt;code&gt;list_all&lt;/code&gt; that we used to get the tab names from our worksheet and pull all of the data in to &lt;code&gt;L&lt;/code&gt; (but it could be any letter or name you choose).&lt;/p&gt;
-&lt;p&gt;Then, we will combine the following:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;code&gt;table&lt;/code&gt; - &lt;code&gt;table&lt;/code&gt; uses the cross-classifying factors to build a contingency table of the counts at each combination of factor levels.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;code&gt;unlist&lt;/code&gt; - Given a list structure x, &lt;code&gt;unlist&lt;/code&gt; simplifies it to produce a vector which contains all the atomic components which occur in x.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;code&gt;lapply&lt;/code&gt; - &lt;code&gt;lapply&lt;/code&gt; returns a list of the same length as X, each element of which is the result of applying FUN to the corresponding element of X.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;code&gt;names&lt;/code&gt; - Functions to get or set the names of an object.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;So the code &lt;code&gt;tab &amp;lt;- table(unlist(lapply(L, names)))&lt;/code&gt; is doing the following:&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;&lt;p&gt;Looks for the columns names within &lt;code&gt;L&lt;/code&gt; or whatever you assigned &lt;code&gt;list_all&lt;/code&gt; to&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;code&gt;unlist&lt;/code&gt; all of them via &lt;code&gt;lapply&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Creates a &lt;code&gt;table&lt;/code&gt; of the column names across all of the dfs in &lt;code&gt;L&lt;/code&gt; and tallies up how many times they occurred&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Assigns them to the object &lt;code&gt;tab&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Then, the final line of code, &lt;code&gt;names(tab[tab == length(L)])&lt;/code&gt; looks for any &lt;code&gt;names&lt;/code&gt; in the table &lt;code&gt;tab&lt;/code&gt; that occur the same amount of times as the &lt;code&gt;length&lt;/code&gt; of &lt;code&gt;L&lt;/code&gt;, your list, which in this instance is 8.&lt;/p&gt;
-&lt;p&gt;If you are unfamiliar with any of the R functions above, I implore you to learn more about them as you will probably see them a lot.&lt;/p&gt;
-&lt;p&gt;Alright, what actually happens if we run the code?&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#From: https://stackoverflow.com/questions/52860105/how-to-find-common-variables-in-different-data-frames
-L &amp;lt;- list_all
-tab &amp;lt;- table(unlist(lapply(L, names)))
-names(tab[tab == length(L)])&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## character(0)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;code&gt;character(0)&lt;/code&gt;. What does that mean? That means that no columns occurred across all of the dfs. You may be feeling despondent at this point, but don’t give up hope! There is magic in that second line &lt;code&gt;tab &amp;lt;- table(unlist(lapply(L, names)))&lt;/code&gt; as it will tell us which columns occur and how many times it happens.&lt;/p&gt;
-&lt;p&gt;Let’s run the code again, but just the &lt;code&gt;table(unlist(lapply(L, names)))&lt;/code&gt; portion to see what we get.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;table(unlist(lapply(L, names)))&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 
-##       accident_type           attrition          department         employee_id 
-##                   1                   1                   3                   7 
-##          engagement              gender           job_level            location 
-##                   2                   1                   2                   1 
-##            new_hire      overtime_hours  performance_rating              rating 
-##                   1                   1                   1                   1 
-##   recruiting_source              salary     sales_quota_pct vacation_days_taken 
-##                   1                   2                   1                   1 
-##                year 
-##                   3&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;!--     accident_type           attrition          department         employee_id          engagement              gender  --&gt;
-&lt;!--                 1                   1                   3                   7                   2                   1  --&gt;
-&lt;!--         job_level            location            new_hire      overtime_hours  performance_rating              rating  --&gt;
-&lt;!--                 2                   1                   1                   1                   1                   1  --&gt;
-&lt;!-- recruiting_source              salary     sales_quota_pct vacation_days_taken                year  --&gt;
-&lt;!--                 1                   2                   1                   1                   3  --&gt;&lt;/p&gt;
-&lt;p&gt;This is very useful information! We can see that &lt;code&gt;accident_type&lt;/code&gt; showed up once across all 8 dfs, &lt;code&gt;salary&lt;/code&gt; showed up twice and so forth, but the gem is that &lt;code&gt;employee_id&lt;/code&gt; showed up 7 times. It is also great that &lt;code&gt;employee_id&lt;/code&gt; happens to be a unique identifier so that is what we will use to merge 7 out of our 8 dfs together.&lt;/p&gt;
-&lt;p&gt;Here is where we jump the shark…I was wondering, well if I had 100 dfs and only 99 of them had the required column for merging…how would I know which one didn’t. The brute force way is to simply go through each and every one of them and check, but that is not scalable nor conducive to a mistake free process. After searching a bit, I came across (
-&lt;a href=&#34;https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r&#34;&gt;this solution&lt;/a&gt; on Stackoverflow. We create a function to take a look into all the dfs in our list, &lt;code&gt;list_all&lt;/code&gt; and return a logical if &lt;code&gt;employee_id&lt;/code&gt; is or is not present. Notice that for &lt;code&gt;recruitment&lt;/code&gt;, it list &lt;code&gt;FALSE&lt;/code&gt;. Sure enough, if you look at the &lt;code&gt;recruitment&lt;/code&gt; df, it does not contain our desired column.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#From: https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r
-reqnames &amp;lt;- c(&amp;quot;employee_id&amp;quot;)
-lapply(list_all, function(x) any(names(x) %in% reqnames))&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## $accident
-## [1] TRUE
-## 
-## $fair_pay
-## [1] TRUE
-## 
-## $hr
-## [1] TRUE
-## 
-## $hr_2
-## [1] TRUE
-## 
-## $performance
-## [1] TRUE
-## 
-## $recruitment
-## [1] FALSE
-## 
-## $survey
-## [1] TRUE
-## 
-## $survey_2
-## [1] TRUE&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;If we count, we see that &lt;code&gt;recruitment&lt;/code&gt; is the 6th df in the list. We can create a new list called &lt;code&gt;new_list&lt;/code&gt; where we remove &lt;code&gt;recruitement&lt;/code&gt; and then we can run it through our code from above.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;new_list &amp;lt;- list_all[-6]&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;L &amp;lt;- new_list
-tab &amp;lt;- table(unlist(lapply(L, names)))
-names(tab[tab == length(L)])&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;employee_id&amp;quot;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;It now returns &lt;code&gt;employee_id&lt;/code&gt;!&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-</description>
-    </item>
     
     <item>
       <title>Working with Data-Part 2-Pulling in data from Excel</title>
@@ -1034,10 +884,12 @@ saveWorkbook(wb, paste0(&amp;quot;00_Data/Additional Data for Attrition Data Set
       <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
       <guid>http://robstilson.rbind.io/post/exploratory-data-analysis-part-1/</guid>
       <description>
+&lt;script src=&#34;http://robstilson.rbind.io/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
 
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;
+&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#get-packages&#34;&gt;Get Packages&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#load-packages&#34;&gt;Load packages&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#bring-in-the-data&#34;&gt;Bring in the data&lt;/a&gt;&lt;/li&gt;
@@ -3315,6 +3167,7 @@ Data %&amp;gt;%
       <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
       <guid>http://robstilson.rbind.io/post/what-this-site-is-about/</guid>
       <description>
+&lt;script src=&#34;http://robstilson.rbind.io/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;div id=&#34;welcome&#34; class=&#34;section level1&#34;&gt;

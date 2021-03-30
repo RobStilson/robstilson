@@ -171,10 +171,12 @@ str(list_all)&lt;/code&gt;&lt;/pre&gt;
       <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
       <guid>http://robstilson.rbind.io/post/exploratory-data-analysis-part-1/</guid>
       <description>
+&lt;script src=&#34;http://robstilson.rbind.io/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
 
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;
+&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#get-packages&#34;&gt;Get Packages&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#load-packages&#34;&gt;Load packages&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#bring-in-the-data&#34;&gt;Bring in the data&lt;/a&gt;&lt;/li&gt;
