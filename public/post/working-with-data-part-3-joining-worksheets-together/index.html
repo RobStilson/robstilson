@@ -30,7 +30,7 @@
   
     
   
-  <meta name="description" content="SummaryBring in the dataDetermining what columns on which to joinSummaryIn the Part 2, we covered loading Excel data from you local machine into R.">
+  <meta name="description" content="SummaryBring in the dataDetermining what columns on which to joinWrap upJust the codeSummaryIn the Part 2, we covered loading Excel data from you local machine into R.">
 
   
   <link rel="alternate" hreflang="en-us" href="http://robstilson.rbind.io/post/working-with-data-part-3-joining-worksheets-together/">
@@ -252,13 +252,13 @@
   <meta property="og:site_name" content="Website of Rob Stilson">
   <meta property="og:url" content="http://robstilson.rbind.io/post/working-with-data-part-3-joining-worksheets-together/">
   <meta property="og:title" content="Working with Data-Part 3-Joining worksheets together | Website of Rob Stilson">
-  <meta property="og:description" content="SummaryBring in the dataDetermining what columns on which to joinSummaryIn the Part 2, we covered loading Excel data from you local machine into R."><meta property="og:image" content="http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png">
+  <meta property="og:description" content="SummaryBring in the dataDetermining what columns on which to joinWrap upJust the codeSummaryIn the Part 2, we covered loading Excel data from you local machine into R."><meta property="og:image" content="http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png">
   <meta property="twitter:image" content="http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="en-us">
   
     
       <meta property="article:published_time" content="2020-12-09T00:00:00&#43;00:00">
     
-    <meta property="article:modified_time" content="2020-12-09T19:33:20-05:00">
+    <meta property="article:modified_time" content="2021-12-09T19:33:20-05:00">
   
 
   
@@ -287,7 +287,7 @@
   "headline": "Working with Data-Part 3-Joining worksheets together",
   
   "datePublished": "2020-12-09T00:00:00Z",
-  "dateModified": "2020-12-09T19:33:20-05:00",
+  "dateModified": "2021-12-09T19:33:20-05:00",
   
   "author": {
     "@type": "Person",
@@ -302,7 +302,7 @@
       "url": "http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png"
     }
   },
-  "description": "Summary\rBring in the data\rDetermining what columns on which to join\r\r\r\rSummary\rIn the Part 2, we covered loading Excel data from you local machine into R."
+  "description": "Summary\r\rBring in the data\rDetermining what columns on which to join\r\rWrap up\rJust the code\r\r\rSummary\rIn the Part 2, we covered loading Excel data from you local machine into R."
 }
 </script>
 
@@ -543,7 +543,7 @@
           Last updated on
       
     
-    Dec 9, 2020
+    Dec 9, 2021
   </span>
   
 
@@ -552,7 +552,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    6 min read
+    16 min read
   </span>
   
 
@@ -594,13 +594,17 @@
             <div class="article-container">
               <div class="article-style">
                 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
-<li><a href="#summary">Summary</a><ul>
+<li><a href="#summary">Summary</a>
+<ul>
 <li><a href="#bring-in-the-data">Bring in the data</a></li>
 <li><a href="#determining-what-columns-on-which-to-join">Determining what columns on which to join</a></li>
 </ul></li>
+<li><a href="#wrap-up">Wrap up</a></li>
+<li><a href="#just-the-code">Just the code</a></li>
 </ul>
 </div>
 
@@ -733,7 +737,452 @@ tab &lt;- table(unlist(lapply(L, names)))
 names(tab[tab == length(L)])</code></pre>
 <pre><code>## [1] &quot;employee_id&quot;</code></pre>
 <p>It now returns <code>employee_id</code>!</p>
+<p>Ok, now that we have gone through all of that, let’s join the 7 sheets that contain <code>employee_id</code> together. Again, we could do this one at a time, but there is a much easier and quicker way. Will will call this df <code>Extra_Data</code> since we are going to join it with our main attrition data.</p>
+<pre class="r"><code>Extra_Data &lt;- list(accident, #year
+fair_pay,
+hr,         
+hr_2, #year       
+performance, 
+survey,      
+survey_2) %&gt;% # year
+  reduce(left_join, by = c(&quot;employee_id&quot;))</code></pre>
+<pre><code>## left_join: added 4 columns (department, salary, new_hire, job_level)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (1,185)</code></pre>
+<pre><code>##            &gt; matched rows       302</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total         302</code></pre>
+<pre><code>## left_join: added 5 columns (department.x, job_level.x, department.y, job_level.y, gender)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (1,185)</code></pre>
+<pre><code>##            &gt; matched rows       302</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total         302</code></pre>
+<pre><code>## left_join: added 4 columns (year.x, year.y, location, overtime_hours)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (2,370)</code></pre>
+<pre><code>##            &gt; matched rows       604    (includes duplicates)</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total         604</code></pre>
+<pre><code>## left_join: added one column (rating)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (1,185)</code></pre>
+<pre><code>##            &gt; matched rows       604</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total         604</code></pre>
+<pre><code>## left_join: added 5 columns (salary.x, department, engagement, salary.y, vacation_days_taken)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (1,185)</code></pre>
+<pre><code>##            &gt; matched rows       604</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total         604</code></pre>
+<pre><code>## left_join: added 3 columns (engagement.x, year, engagement.y)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (2,370)</code></pre>
+<pre><code>##            &gt; matched rows     1,208    (includes duplicates)</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total       1,208</code></pre>
+<p>Now if we take a look at the new df, we see that some columns were duplicated and recieved a <code>.x</code> or <code>.y</code>. This is due to R not being able to handle multiple columns in the same df with the same name (which makes sense). There may be a more straigth forward way to deal with this, but we are simply going to look at all the column names and then only select the original ones and then rename them to remove the suffix.</p>
+<pre class="r"><code>head(Extra_Data)</code></pre>
+<pre><code>## # A tibble: 6 x 20
+##   year.x employee_id accident_type department.x salary.x new_hire job_level.x
+##    &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      
+## 1   2017           1 Mild          Sales         103264. No       Salaried   
+## 2   2017           1 Mild          Sales         103264. No       Salaried   
+## 3   2017           1 Mild          Sales         103264. No       Salaried   
+## 4   2017           1 Mild          Sales         103264. No       Salaried   
+## 5   2017           4 Mild          Engineering    60737. Yes      Hourly     
+## 6   2017           4 Mild          Engineering    60737. Yes      Hourly     
+## # ... with 13 more variables: department.y &lt;chr&gt;, job_level.y &lt;chr&gt;,
+## #   gender &lt;chr&gt;, year.y &lt;dbl&gt;, location &lt;chr&gt;, overtime_hours &lt;dbl&gt;,
+## #   rating &lt;dbl&gt;, department &lt;chr&gt;, engagement.x &lt;dbl&gt;, salary.y &lt;dbl&gt;,
+## #   vacation_days_taken &lt;dbl&gt;, year &lt;dbl&gt;, engagement.y &lt;dbl&gt;</code></pre>
+<pre class="r"><code>cat(colnames(Extra_Data), sep = &quot;,\n&quot;)</code></pre>
+<pre><code>## year.x,
+## employee_id,
+## accident_type,
+## department.x,
+## salary.x,
+## new_hire,
+## job_level.x,
+## department.y,
+## job_level.y,
+## gender,
+## year.y,
+## location,
+## overtime_hours,
+## rating,
+## department,
+## engagement.x,
+## salary.y,
+## vacation_days_taken,
+## year,
+## engagement.y</code></pre>
+<pre class="r"><code>Extra_Data &lt;- Extra_Data %&gt;%
+  select(year.x,
+         employee_id,
+         accident_type,
+         department.x,
+         salary.x,
+         new_hire,
+         job_level.x,
+         # department.y,
+         # job_level.y,
+         gender,
+         # year.y,
+         location,
+         overtime_hours,
+         rating,
+         department,
+         engagement.x,
+         # salary.y,
+         vacation_days_taken,
+         year
+         # engagement.y
+         )</code></pre>
+<pre><code>## select: dropped 5 variables (department.y, job_level.y, year.y, salary.y, engagement.y)</code></pre>
+<p>Notice in this code that everything with the suffix <code>.y</code> has gotten the CTRL + SHIFT + c treatment and been commented out.</p>
+<pre class="r"><code>head(Extra_Data)</code></pre>
+<pre><code>## # A tibble: 6 x 15
+##   year.x employee_id accident_type department.x salary.x new_hire job_level.x
+##    &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      
+## 1   2017           1 Mild          Sales         103264. No       Salaried   
+## 2   2017           1 Mild          Sales         103264. No       Salaried   
+## 3   2017           1 Mild          Sales         103264. No       Salaried   
+## 4   2017           1 Mild          Sales         103264. No       Salaried   
+## 5   2017           4 Mild          Engineering    60737. Yes      Hourly     
+## 6   2017           4 Mild          Engineering    60737. Yes      Hourly     
+## # ... with 8 more variables: gender &lt;chr&gt;, location &lt;chr&gt;,
+## #   overtime_hours &lt;dbl&gt;, rating &lt;dbl&gt;, department &lt;chr&gt;, engagement.x &lt;dbl&gt;,
+## #   vacation_days_taken &lt;dbl&gt;, year &lt;dbl&gt;</code></pre>
+<p>And now we are still having a problem with <code>department</code> and it looks like <code>year</code> may have gotten mixed up as well. We may have to do this in layers after all.</p>
+<p>First we will gather all of the extra data that contains <code>year</code>.</p>
+<pre class="r"><code>Extra_Data_year &lt;- list(accident, #year
+hr_2, #year       
+survey_2) %&gt;% # year
+  reduce(full_join, by = c(&quot;employee_id&quot;, &quot;year&quot;)) #Notice we are doing a full_join instead of a left_join since we want to get all of the data and we know that someone may have had an accident one year but not another year.</code></pre>
+<pre><code>## full_join: added 2 columns (location, overtime_hours)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y   2,638</code></pre>
+<pre><code>##            &gt; matched rows       302</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total       2,940</code></pre>
+<pre><code>## full_join: added one column (engagement)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y       0</code></pre>
+<pre><code>##            &gt; matched rows     2,940</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total       2,940</code></pre>
+<pre class="r"><code>head(Extra_Data_year)</code></pre>
+<pre><code>## # A tibble: 6 x 6
+##    year employee_id accident_type location    overtime_hours engagement
+##   &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt;                &lt;dbl&gt;      &lt;dbl&gt;
+## 1  2017           1 Mild          Northwood                8          3
+## 2  2017           4 Mild          East Valley              2          3
+## 3  2017          11 Mild          East Valley             13          1
+## 4  2017          19 Mild          Northwood                4          3
+## 5  2017          22 Mild          Southfield              20          2
+## 6  2016          23 Mild          Northwood                5          1</code></pre>
+<p>That is looking clean. Now we will use all of the data that has <code>department</code>.</p>
+<pre class="r"><code>Extra_Data_dept &lt;- list(fair_pay,
+hr,         
+survey) %&gt;% 
+  reduce(left_join, by = c(&quot;employee_id&quot;, &quot;department&quot;))</code></pre>
+<pre><code>## left_join: added 3 columns (job_level.x, job_level.y, gender)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (    0)</code></pre>
+<pre><code>##            &gt; matched rows     1,470</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total       1,470</code></pre>
+<pre><code>## left_join: added 4 columns (salary.x, engagement, salary.y, vacation_days_taken)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (    0)</code></pre>
+<pre><code>##            &gt; matched rows     1,470</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total       1,470</code></pre>
+<pre class="r"><code>head(Extra_Data_dept)</code></pre>
+<pre><code>## # A tibble: 6 x 10
+##   employee_id department  salary.x new_hire job_level.x job_level.y gender
+##         &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt; 
+## 1           1 Sales        103264. No       Salaried    Salaried    Female
+## 2           2 Engineering   80709. No       Hourly      Hourly      Female
+## 3           4 Engineering   60737. Yes      Hourly      Hourly      Female
+## 4           5 Engineering   99116. Yes      Salaried    Salaried    Male  
+## 5           7 Engineering   51022. No       Hourly      Hourly      Male  
+## 6           8 Engineering   98400. No       Salaried    Salaried    Female
+## # ... with 3 more variables: engagement &lt;dbl&gt;, salary.y &lt;dbl&gt;,
+## #   vacation_days_taken &lt;dbl&gt;</code></pre>
+<p>We’ve got some duplicates here. Let’s just make sure they are the same before we eliminate one.</p>
+<pre class="r"><code>Extra_Data_dupe &lt;- Extra_Data_dept %&gt;%
+  mutate(sal_same = salary.x == salary.y, #This will create a logical TRUE/FALSE We hope to see all TRUE for both
+         job_same = job_level.x == job_level.y) %&gt;%
+  select(employee_id,
+         sal_same,
+         job_same)</code></pre>
+<pre><code>## mutate: new variable &#39;sal_same&#39; (logical) with 2 unique values and 0% NA</code></pre>
+<pre><code>##         new variable &#39;job_same&#39; (logical) with one unique value and 0% NA</code></pre>
+<pre><code>## select: dropped 9 variables (department, salary.x, new_hire, job_level.x, job_level.y, …)</code></pre>
+<pre class="r"><code>summary(Extra_Data_dupe)</code></pre>
+<pre><code>##   employee_id      sal_same       job_same      
+##  Min.   :   1.0   Mode :logical   Mode:logical  
+##  1st Qu.: 491.2   FALSE:16        TRUE:1470     
+##  Median :1020.5   TRUE :1454                    
+##  Mean   :1024.9                                 
+##  3rd Qu.:1555.8                                 
+##  Max.   :2068.0</code></pre>
+<p>The summary is telling us that we have 16 <code>FALSE</code> where they don’t match. Let’s find them and take a look.</p>
+<pre class="r"><code>sal_false &lt;- Extra_Data_dupe %&gt;%
+  filter(sal_same == FALSE)</code></pre>
+<p>Now let’s filter <code>Extra_Data_dept</code> using <code>sal_false</code> to bring out the 16 we want to take a look at.</p>
+<pre class="r"><code>sal_look &lt;- Extra_Data_dept %&gt;%
+  filter(employee_id %in% sal_false$employee_id)</code></pre>
+<p>They are definitely different. In this case, we will default to the value given in the <code>fair_pay</code> data, but in a real situation we would reach out to the appropriate SME in order to determine the correct course of action. If for whatever reason, that is not possible, remember, document, document, document!!!! This will help future you and anybody else who encounters your code.</p>
+<pre class="r"><code>Extra_Data_dept &lt;- Extra_Data_dept %&gt;%
+  select(employee_id,
+         department,
+         salary.x, # Using salary.x instead of .y due to inclusion in `fair_pay` data, but check on this
+         new_hire,
+         job_level.x,
+         # job_level.y,
+         gender,
+         engagement,
+         # salary.y,
+         vacation_days_taken) %&gt;%
+  rename(salary = salary.x,
+         job_level = job_level.x)</code></pre>
+<pre><code>## select: dropped 2 variables (job_level.y, salary.y)</code></pre>
+<pre><code>## rename: renamed 2 variables (salary, job_level)</code></pre>
+<pre class="r"><code>colnames(Extra_Data_dept)</code></pre>
+<pre><code>## [1] &quot;employee_id&quot;         &quot;department&quot;          &quot;salary&quot;             
+## [4] &quot;new_hire&quot;            &quot;job_level&quot;           &quot;gender&quot;             
+## [7] &quot;engagement&quot;          &quot;vacation_days_taken&quot;</code></pre>
+<p>The names look good now.</p>
+<p>We’ll merge together <code>Extra_Data_year</code> with <code>Extra_Data_dept</code>.</p>
+<p>Before we join <code>Extra_Data_year</code>, let’s make it wide_data instead of tall_data with <code>pivot_wider</code>.</p>
+<pre class="r"><code>Extra_Data_year_cast &lt;- Extra_Data_year %&gt;%
+  pivot_wider(names_from = year,
+              values_from = c(accident_type,
+                              overtime_hours,
+                              engagement))</code></pre>
+<pre><code>## pivot_wider: reorganized (year, accident_type, overtime_hours, engagement) into (accident_type_2017, accident_type_2016, overtime_hours_2017, overtime_hours_2016, engagement_2017, …) [was 2940x6, now 1470x8]</code></pre>
+<pre class="r"><code>Extra_Data_year_dept &lt;- Extra_Data_dept %&gt;%
+  left_join(Extra_Data_year_cast, by = &quot;employee_id&quot;)</code></pre>
+<pre><code>## left_join: added 7 columns (location, accident_type_2017, accident_type_2016, overtime_hours_2017, overtime_hours_2016, …)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (    0)</code></pre>
+<pre><code>##            &gt; matched rows     1,470</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total       1,470</code></pre>
+<p>Finally, we will join the <code>Extra_Data_year_dept</code> data with <code>performance</code> before the final join with the main data.</p>
+<pre class="r"><code>Extra_Data &lt;- Extra_Data_year_dept %&gt;%
+  left_join(performance, by = &quot;employee_id&quot;)</code></pre>
+<pre><code>## left_join: added one column (rating)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (    0)</code></pre>
+<pre><code>##            &gt; matched rows     1,470</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total       1,470</code></pre>
+<p>Load the original data.</p>
+<pre class="r"><code>library(modeldata)
+
+data(attrition)
+
+Data &lt;- attrition</code></pre>
+<pre class="r"><code>library(readr)</code></pre>
+<pre><code>## Warning: package &#39;readr&#39; was built under R version 4.0.5</code></pre>
+<pre class="r"><code>Data &lt;- read_csv(&quot;D:/Blog/WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;)</code></pre>
+<pre><code>## Rows: 1470 Columns: 35</code></pre>
+<pre><code>## -- Column specification --------------------------------------------------------
+## Delimiter: &quot;,&quot;
+## chr  (9): Attrition, BusinessTravel, Department, EducationField, Gender, Job...
+## dbl (26): Age, DailyRate, DistanceFromHome, Education, EmployeeCount, Employ...</code></pre>
+<pre><code>## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p><code>left_join</code> with the <code>Extra_Data</code> we just created.</p>
+<pre class="r"><code>Data &lt;- Data %&gt;%
+  left_join(Extra_Data, by = c(&quot;EmployeeNumber&quot; = &quot;employee_id&quot;))</code></pre>
+<pre><code>## left_join: added 15 columns (department, salary, new_hire, job_level, gender, …)</code></pre>
+<pre><code>##            &gt; rows only in x       0</code></pre>
+<pre><code>##            &gt; rows only in y  (    0)</code></pre>
+<pre><code>##            &gt; matched rows     1,470</code></pre>
+<pre><code>##            &gt;                 =======</code></pre>
+<pre><code>##            &gt; rows total       1,470</code></pre>
 </div>
+</div>
+<div id="wrap-up" class="section level1">
+<h1>Wrap up</h1>
+<p>We consolidated all of the extra data frames into one and then merged them with our original dataframe.</p>
+</div>
+<div id="just-the-code" class="section level1">
+<h1>Just the code</h1>
+<pre class="r"><code>#&#39; &lt;!-- ####################################################################################################### --&gt;
+#&#39; &lt;!-- ####################################################################################################### --&gt;
+#&#39; &lt;!-- ##################################LOADING PACKAGES##################################################### --&gt;
+
+tryCatch(require(pacman),finally=utils:::install.packages(pkgs=&#39;pacman&#39;,repos=&#39;http://cran.r-project.org&#39;));
+require(pacman)
+
+# if the above doesn&#39;t work, use this code#
+# tryCatch
+# detach(&quot;package:pacman&quot;, unload = TRUE)
+# install.packages(&quot;pacman&quot;, dependencies = TRUE)
+# install.packages(&quot;pacman&quot;)
+
+pacman::p_load(modeldata, # data sets useful for modeling packages
+               dplyr, # a grammar of data manipulation
+               tidyr, # tidy messy data
+               readxl, # read Excel files
+               ggplot2, # create elegant data visualisations using the grammar of graphics
+               knitr, # a general-purpose package for dynamic report generation in R
+               broom, # convert statistical objects into tidy tibbles
+               purrr, # functional programming tools
+               psych, #procedures for psychological, psychometric, and personality research
+               conflicted, # an alternative conflict resolution strategy for like named function in different libraries
+               janitor, # simple tools for examining and cleaning dirty data
+               skimr, # compact and flexible summaries of data
+               openxlsx, # read write and edit xlsx files
+               RCurl, # general Network (HTTP/FTP/...) Client Interface for R
+               tidyquant, # tidy quantitative financial analysis
+               tidylog # logging for `dplyr` and `tidyr` functions
+)
+
+
+#&#39; &lt;!-- #Loading libraries --&gt;
+
+suppressPackageStartupMessages({
+  library(modeldata)      
+  library(dplyr)
+  library(tidyr)
+  library(readxl)
+  library(ggplot2)
+  library(knitr)
+  library(broom)
+  library(purrr)
+  library(psych)
+  library(conflicted)
+  library(janitor)
+  library(skimr)
+  library(openxlsx)
+  library(RCurl)
+  library(tidyquant)
+  library(tidylog, warn.conflicts = FALSE)
+})
+
+for (f in getNamespaceExports(&quot;tidylog&quot;)) {
+    conflicted::conflict_prefer(f, &quot;tidylog&quot;, quiet = TRUE)
+}
+
+conflict_prefer(&quot;filter&quot;, &quot;dplyr&quot;)
+xl_data &lt;- &quot;D:/Blog/Additional Data for Attrition Data Set_09_09_2020.xlsx&quot;
+
+tab_names &lt;- excel_sheets(path = xl_data)
+
+list_all &lt;- lapply(tab_names, function(x) read_excel(path = xl_data, sheet = x))
+
+names(list_all) &lt;- tab_names
+
+list2env(list_all, .GlobalEnv)
+#From: https://stackoverflow.com/questions/52860105/how-to-find-common-variables-in-different-data-frames
+L &lt;- list_all
+tab &lt;- table(unlist(lapply(L, names)))
+names(tab[tab == length(L)])
+table(unlist(lapply(L, names)))
+#From: https://stackoverflow.com/questions/32251679/extracting-data-frames-from-a-list-based-on-column-names-in-r
+reqnames &lt;- c(&quot;employee_id&quot;)
+lapply(list_all, function(x) any(names(x) %in% reqnames))
+new_list &lt;- list_all[-6]
+L &lt;- new_list
+tab &lt;- table(unlist(lapply(L, names)))
+names(tab[tab == length(L)])
+Extra_Data &lt;- list(accident, #year
+fair_pay,
+hr,         
+hr_2, #year       
+performance, 
+survey,      
+survey_2) %&gt;% # year
+  reduce(left_join, by = c(&quot;employee_id&quot;))
+head(Extra_Data)
+cat(colnames(Extra_Data), sep = &quot;,\n&quot;)
+Extra_Data &lt;- Extra_Data %&gt;%
+  select(year.x,
+         employee_id,
+         accident_type,
+         department.x,
+         salary.x,
+         new_hire,
+         job_level.x,
+         # department.y,
+         # job_level.y,
+         gender,
+         # year.y,
+         location,
+         overtime_hours,
+         rating,
+         department,
+         engagement.x,
+         # salary.y,
+         vacation_days_taken,
+         year
+         # engagement.y
+         )
+head(Extra_Data)
+Extra_Data_year &lt;- list(accident, #year
+hr_2, #year       
+survey_2) %&gt;% # year
+  reduce(full_join, by = c(&quot;employee_id&quot;, &quot;year&quot;)) #Notice we are doing a full_join instead of a left_join since we want to get all of the data and we know that someone may have had an accident one year but not another year.
+head(Extra_Data_year)
+Extra_Data_dept &lt;- list(fair_pay,
+hr,         
+survey) %&gt;% 
+  reduce(left_join, by = c(&quot;employee_id&quot;, &quot;department&quot;))
+head(Extra_Data_dept)
+Extra_Data_dupe &lt;- Extra_Data_dept %&gt;%
+  mutate(sal_same = salary.x == salary.y, #This will create a logical TRUE/FALSE We hope to see all TRUE for both
+         job_same = job_level.x == job_level.y) %&gt;%
+  select(employee_id,
+         sal_same,
+         job_same)
+
+summary(Extra_Data_dupe)
+sal_false &lt;- Extra_Data_dupe %&gt;%
+  filter(sal_same == FALSE)
+sal_look &lt;- Extra_Data_dept %&gt;%
+  filter(employee_id %in% sal_false$employee_id)
+Extra_Data_dept &lt;- Extra_Data_dept %&gt;%
+  select(employee_id,
+         department,
+         salary.x, # Using salary.x instead of .y due to inclusion in `fair_pay` data, but check on this
+         new_hire,
+         job_level.x,
+         # job_level.y,
+         gender,
+         engagement,
+         # salary.y,
+         vacation_days_taken) %&gt;%
+  rename(salary = salary.x,
+         job_level = job_level.x)
+
+colnames(Extra_Data_dept)
+Extra_Data_year_cast &lt;- Extra_Data_year %&gt;%
+  pivot_wider(names_from = year,
+              values_from = c(accident_type,
+                              overtime_hours,
+                              engagement))
+Extra_Data_year_dept &lt;- Extra_Data_dept %&gt;%
+  left_join(Extra_Data_year_cast, by = &quot;employee_id&quot;)
+Extra_Data &lt;- Extra_Data_year_dept %&gt;%
+  left_join(performance, by = &quot;employee_id&quot;)
+library(modeldata)
+
+data(attrition)
+
+Data &lt;- attrition
+library(readr)
+Data &lt;- read_csv(&quot;D:/Blog/WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;)
+Data &lt;- Data %&gt;%
+  left_join(Extra_Data, by = c(&quot;EmployeeNumber&quot; = &quot;employee_id&quot;))</code></pre>
 </div>
 
               </div>

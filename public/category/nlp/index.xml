@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NLP | Website of Rob Stilson</title>
+    <link>http://robstilson.rbind.io/category/nlp/</link>
+      <atom:link href="http://robstilson.rbind.io/category/nlp/index.xml" rel="self" type="application/rss+xml" />
+    <description>NLP</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 06 Jan 2022 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>http://robstilson.rbind.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>NLP</title>
+      <link>http://robstilson.rbind.io/category/nlp/</link>
+    </image>
+    
+    <item>
+      <title>Topic Modeling for Known Topics</title>
+      <link>http://robstilson.rbind.io/post/topic-modeling-for-known-topics/</link>
+      <pubDate>Thu, 06 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>http://robstilson.rbind.io/post/topic-modeling-for-known-topics/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

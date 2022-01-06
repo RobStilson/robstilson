@@ -34,7 +34,47 @@
   
   <url>
     <loc>http://robstilson.rbind.io/categories/</loc>
-    <lastmod>2020-09-21T09:58:45-04:00</lastmod>
+    <lastmod>2022-01-06T10:00:09-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/tag/nlp/</loc>
+    <lastmod>2022-01-06T10:00:09-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/category/nlp/</loc>
+    <lastmod>2022-01-06T10:00:09-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/post/</loc>
+    <lastmod>2022-01-06T10:00:09-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/tags/</loc>
+    <lastmod>2022-01-06T10:00:09-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/post/topic-modeling-for-known-topics/</loc>
+    <lastmod>2022-01-06T10:00:09-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/category/topics/</loc>
+    <lastmod>2022-01-06T10:00:09-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/category/joins/</loc>
+    <lastmod>2021-12-09T19:33:20-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://robstilson.rbind.io/post/working-with-data-part-3-joining-worksheets-together/</loc>
+    <lastmod>2021-12-09T19:33:20-05:00</lastmod>
   </url>
   
   <url>
@@ -43,18 +83,8 @@
   </url>
   
   <url>
-    <loc>http://robstilson.rbind.io/post/</loc>
-    <lastmod>2020-09-21T09:58:45-04:00</lastmod>
-  </url>
-  
-  <url>
     <loc>http://robstilson.rbind.io/post/working-with-data-part-2-pulling-in-data-from-excel/</loc>
     <lastmod>2020-09-21T09:58:45-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://robstilson.rbind.io/category/joins/</loc>
-    <lastmod>2020-09-09T20:02:04-04:00</lastmod>
   </url>
   
   <url>
@@ -109,11 +139,6 @@
   
   <url>
     <loc>http://robstilson.rbind.io/tag/source-themes/</loc>
-    <lastmod>2019-04-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://robstilson.rbind.io/tags/</loc>
     <lastmod>2019-04-07T00:00:00+00:00</lastmod>
   </url>
   
