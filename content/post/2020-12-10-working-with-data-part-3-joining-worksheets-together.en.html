@@ -1,4 +1,27 @@
-<script src="2020-12-10-working-with-data-part-3-joining-worksheets-together.en_files/header-attrs-2.7/header-attrs.js"></script>
+---
+title: Working with Data-Part 3-Joining worksheets together
+author: robstilson
+date: '2020-12-09'
+slug: working-with-data-part-3-joining-worksheets-together
+categories:
+  - Joins
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2021-12-09T19:33:20-05:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
@@ -306,14 +329,14 @@ survey) %&gt;%
 <pre><code>##            &gt; rows total       1,470</code></pre>
 <pre class="r"><code>head(Extra_Data_dept)</code></pre>
 <pre><code>## # A tibble: 6 x 10
-##   employee_id department salary.x new_hire job_level.x job_level.y gender
-##         &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt; 
-## 1           1 Sales       103264. No       Salaried    Salaried    Female
-## 2           2 Engineeri~   80709. No       Hourly      Hourly      Female
-## 3           4 Engineeri~   60737. Yes      Hourly      Hourly      Female
-## 4           5 Engineeri~   99116. Yes      Salaried    Salaried    Male  
-## 5           7 Engineeri~   51022. No       Hourly      Hourly      Male  
-## 6           8 Engineeri~   98400. No       Salaried    Salaried    Female
+##   employee_id department  salary.x new_hire job_level.x job_level.y gender
+##         &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt; 
+## 1           1 Sales        103264. No       Salaried    Salaried    Female
+## 2           2 Engineering   80709. No       Hourly      Hourly      Female
+## 3           4 Engineering   60737. Yes      Hourly      Hourly      Female
+## 4           5 Engineering   99116. Yes      Salaried    Salaried    Male  
+## 5           7 Engineering   51022. No       Hourly      Hourly      Male  
+## 6           8 Engineering   98400. No       Salaried    Salaried    Female
 ## # ... with 3 more variables: engagement &lt;dbl&gt;, salary.y &lt;dbl&gt;,
 ## #   vacation_days_taken &lt;dbl&gt;</code></pre>
 <p>We’ve got some duplicates here. Let’s just make sure they are the same before we eliminate one.</p>
@@ -392,22 +415,17 @@ survey) %&gt;%
 data(attrition)
 
 Data &lt;- attrition</code></pre>
-<pre class="r"><code>library(readr)
-Data &lt;- read_csv(&quot;D:/Blog/WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;)</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   .default = col_double(),
-##   Attrition = col_character(),
-##   BusinessTravel = col_character(),
-##   Department = col_character(),
-##   EducationField = col_character(),
-##   Gender = col_character(),
-##   JobRole = col_character(),
-##   MaritalStatus = col_character(),
-##   Over18 = col_character(),
-##   OverTime = col_character()
-## )</code></pre>
-<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>library(readr)</code></pre>
+<pre><code>## Warning: package &#39;readr&#39; was built under R version 4.0.5</code></pre>
+<pre class="r"><code>Data &lt;- read_csv(&quot;D:/Blog/WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;)</code></pre>
+<pre><code>## Rows: 1470 Columns: 35</code></pre>
+<pre><code>## -- Column specification --------------------------------------------------------
+## Delimiter: &quot;,&quot;
+## chr  (9): Attrition, BusinessTravel, Department, EducationField, Gender, Job...
+## dbl (26): Age, DailyRate, DistanceFromHome, Education, EmployeeCount, Employ...</code></pre>
+<pre><code>## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <p><code>left_join</code> with the <code>Extra_Data</code> we just created.</p>
 <pre class="r"><code>Data &lt;- Data %&gt;%
   left_join(Extra_Data, by = c(&quot;EmployeeNumber&quot; = &quot;employee_id&quot;))</code></pre>
