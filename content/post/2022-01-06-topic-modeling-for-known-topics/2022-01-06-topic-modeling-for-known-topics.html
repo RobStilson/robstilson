@@ -1,0 +1,279 @@
+---
+title: Topic Modeling for Known Topics
+author: robstilson
+date: '2022-01-06'
+slug: topic-modeling-for-known-topics
+categories:
+  - NLP
+  - Topics
+tags:
+  - NLP
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2022-01-06T10:00:09-05:00'
+featured: no
+draft: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>Sometimes you already know what topics you want to look for in comments. That is what this post is about. We will use combinations of Regular Expressions (REGEX) to tag comments with custom code. A nice thing about this method is that a single comment can be tagged multiple times to account for all of the various aspects it touches on. I’ve found this to be very useful as with survey and social media comments, oftentimes people cover multiple topics with their comments.</p>
+<p>If you are totally unfamiliar with REGEX, I recommend you check out Dr. Richard Lander’s <a href="https://datascience.tntlab.org/">Data Science for Social Scientists</a> and more specifically Module 6 String Manipulation which provides a link for the <a href="https://regexone.com/">RegexOne</a> class. This will help to familiarize you with the concepts of REGEX.</p>
+</div>
+<div id="getting-the-data" class="section level1">
+<h1>Getting the data</h1>
+<p>If you know how to do web scraping, you can bring in comments from the company of your choice from Glassdoor or elsewhere, but for consistency sake, we will use the Honeywell comments provided by <a href="https://www.kaggle.com/dhirajnimbalkar/topicmodellinghoneywellglassdoorreviews">Kaggle</a>.</p>
+<p>We will load it manually</p>
+<pre class="r"><code>library(readr)</code></pre>
+<pre><code>## Warning: package &#39;readr&#39; was built under R version 4.0.5</code></pre>
+<pre class="r"><code>Data &lt;- read_csv(&quot;D:/Blog/glassdoortest1.csv&quot;)</code></pre>
+<pre><code>## New names:
+## * `` -&gt; ...1</code></pre>
+<pre><code>## Rows: 2000 Columns: 5</code></pre>
+<pre><code>## -- Column specification --------------------------------------------------------
+## Delimiter: &quot;,&quot;
+## chr (4): date, title, pros, cons
+## dbl (1): ...1</code></pre>
+<pre><code>## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>Let’s get our column names.</p>
+<pre class="r"><code>colnames(Data)</code></pre>
+<pre><code>## [1] &quot;...1&quot;  &quot;date&quot;  &quot;title&quot; &quot;pros&quot;  &quot;cons&quot;</code></pre>
+<p>Change “…1” to ID</p>
+<pre class="r"><code>Data &lt;- Data %&gt;%
+    rename(ID = &quot;...1&quot;)</code></pre>
+<pre><code>## rename: renamed one variable (ID)</code></pre>
+<p>Check to see that it changed the name.</p>
+<pre class="r"><code>colnames(Data)</code></pre>
+<pre><code>## [1] &quot;ID&quot;    &quot;date&quot;  &quot;title&quot; &quot;pros&quot;  &quot;cons&quot;</code></pre>
+<p>We will just look at the Pros for now.</p>
+<p>Notice we are creating a new df called Comments_df so that we don’t touch the original Data df. This is helpful because we will be slicing, dicing, scattering, etc. to the df in order to split out the text in various ways.</p>
+<pre class="r"><code>#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--#####################BRUTE FORCE TOPIC CLASSIFICATION USING REGEX###################################### --&gt;
+
+Comments_df &lt;- Data %&gt;%
+    select(c(ID, pros)) %&gt;%
+    filter(!is.na(pros)) %&gt;%
+    rename(&#39;comments&#39; = &#39;pros&#39;)</code></pre>
+<pre><code>## select: dropped 3 variables (date, title, cons)</code></pre>
+<pre><code>## rename: renamed one variable (comments)</code></pre>
+<p>Convert everything to lowercase for simplicity.</p>
+<pre class="r"><code>#Converting to lower case
+
+Comments_df &lt;- Comments_df %&gt;%
+    mutate(comments = tolower(comments))</code></pre>
+<pre><code>## mutate: changed 1,853 values (93%) of &#39;comments&#39; (0 new NA)</code></pre>
+<p>Remove all line breaks.</p>
+<pre class="r"><code>#Remove all line breaks
+
+#From: https://stackoverflow.com/questions/21781014/remove-all-line-breaks-enter-symbols-from-the-string-using-r
+
+Comments_df$comments &lt;- gsub(&quot;[\r\n]&quot;, &quot;&quot;, Comments_df$comments)
+
+Comments_df &lt;- Comments_df %&gt;%
+    select(ID, comments) %&gt;%
+    na.omit()</code></pre>
+<pre><code>## select: no changes</code></pre>
+<p>Now let’s create our first known topic. We’ll go with benefits for now.</p>
+<p>Common ones you may want to look at are:</p>
+<ul>
+<li>Benefits</li>
+<li>Career advancement</li>
+<li>Compensation</li>
+<li>Direct Manager</li>
+<li>General Management</li>
+<li>Safety</li>
+</ul>
+<p>What others can you think of?</p>
+<p>You can also do subcategories such as:</p>
+<ul>
+<li>Benefits-Health</li>
+<li>Benefits-Paid Time Off</li>
+</ul>
+<p>What others can you think of?</p>
+<p>Could you build out your own classifer with ~20 or so meta categories and subcategories as needed?</p>
+<pre class="r"><code>#Creating a beginning using `now` from lubridate.
+#This is helpful when you get to several categories using a brute force search so that you (and others if they run you script) know about how long it will take to run.
+
+#After we run everything, we will create `end_time &lt;- now()` along with `print(difftime(end_time, start_time))` as the last line of code after everything we are concerned about has run.
+
+start_time &lt;- now()</code></pre>
+<pre class="r"><code>#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--#################################### BENEFITS ######################################################### --&gt;
+
+#From: https://stackoverflow.com/questions/26319567/use-grepl-to-search-either-of-multiple-substrings-in-a-text
+#From: https://stackoverflow.com/questions/5823503/pattern-matching-using-a-wildcard
+#From: https://stackoverflow.com/questions/31421077/r-wildcard-matching-for-certain-number-of-terms
+#From: https://www.regular-expressions.info/rlanguage.html
+
+benefits &lt;- c(&#39;\\brx\\b&#39;, #this will only get the word &quot;rx&quot; and nothing else
+              &#39;^.*medic.*$&#39;, #this will get medic, medicine, medical, etc.
+              &#39;(?=.*bene)(?=.*(?:health))&#39;, #This will get benefits, beneficial, benefit, etc. but only if it occurs with health, healthy, healthcare, in the same comment
+              &#39;(?=.*coverage)(?=.*(?:medic|deduct|prescrip|insur|drug|health|dependent))&#39;, #This will get coverage, overages, etc. as long as some form of medic, deduct, prescription, etc. occur in the same comment
+                    &#39;\\b(?:health\\W+(?:\\w+\\W+){0,1}?care)\\b&#39;, #this will only get health care or healthcare (e.g. health and care must occur within one word)
+                    &#39;\\bhealthcare\\b&#39;, #this will only get the word &quot;healthcare&quot;. If there is a space between them, it won&#39;t pick it up.
+              &#39;\\bhealth\\s?care\\b&#39;, #this will get the word &quot;healthcare&quot; or &quot;health care&quot; as the \\s? indicates zero or one whitespace character.
+                    &#39;\\b(?:medical\\W+(?:\\w+\\W+){0,3}?benefits|benefits\\W+(?:\\w+\\W+){0,3}?medical)\\b&#39;, #This will get medical benefits or benefits medical as long as they occur within 3 word of each other.
+              &#39;^.*vacation.*$&#39;,
+              &#39;\\bpto\\b&#39;
+                     )
+
+ 
+
+ 
+
+benefits_pattern &lt;- paste(benefits, collapse = &quot;|&quot;) #This puts everything from what you put into `benefits` together into a pattern to search for.
+
+benefits_comments &lt;- as.data.frame(Comments_df[grep(benefits_pattern, Comments_df$comments, value = FALSE, perl = TRUE),]) # This takes the pattern you just created and searches over the entire column of &quot;comments&quot; in the Comments_df
+
+TEST &lt;- Comments_df %&gt;%
+    mutate(benefits = ifelse(comments %in% benefits_comments$comments, &quot;Y&quot;,
+                             &quot;N&quot;)) #This creates a new object, TEST, from Comments_df and if any of the comments in the &quot;comments&quot; column match (%in%) the comments exactly, they get a &quot;Y&quot;. If not they get a &quot;N&quot; in the new &quot;benefits&quot; column</code></pre>
+<pre><code>## mutate: new variable &#39;benefits&#39; (character) with 2 unique values and 0% NA</code></pre>
+<p>This shows we grabbed 80 comments using the above criteria saved as <code>benefits_comments</code>. If you look at the <code>TEST</code> file, you can see which of the 2000 comments fell into the category by looking to see if there is a “Y” or a “N” in the “benefits” column.</p>
+<p>Now we will create a new topic column looking for specific insurance comments around benefits.</p>
+<pre class="r"><code>#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--#################################### BENEFITS_INSURANCE ############################################### --&gt;
+
+#From: https://stackoverflow.com/questions/26319567/use-grepl-to-search-either-of-multiple-substrings-in-a-text
+#From: https://stackoverflow.com/questions/5823503/pattern-matching-using-a-wildcard
+#From: https://stackoverflow.com/questions/31421077/r-wildcard-matching-for-certain-number-of-terms
+#From: https://www.regular-expressions.info/rlanguage.html
+
+benefits_insurance &lt;- c(&#39;(?=.*insur)(?=.*(?:medic|dental|life|vision|supplement|disabl))&#39;,
+                        &#39;\\b(?:insurance\\W+(?:\\w+\\W+){0,1}?premium)\\b&#39;,
+                        &#39;\\binsurance\\b&#39;
+                        )
+
+ 
+
+ 
+
+benefits_insurance_pattern &lt;- paste(benefits_insurance, collapse = &quot;|&quot;) #This puts everything from what you put into `benefits` together into a pattern to search for.
+
+benefits_insurance_comments &lt;- as.data.frame(Comments_df[grep(benefits_insurance_pattern, Comments_df$comments, value = FALSE, perl = TRUE),]) # This takes the pattern you just created and searches over the entire column of &quot;comments&quot; in the Comments_df
+
+TEST &lt;- TEST %&gt;%
+    mutate(benefits_insurance = ifelse(comments %in% benefits_insurance_comments$comments, &quot;Y&quot;,
+                             &quot;N&quot;)) #This creates a new object, TEST, from Comments_df and if any of the comments in the &quot;comments&quot; column match (%in%) the comments exactly, they get a &quot;Y&quot;. If not they get a &quot;N&quot; in the new &quot;benefits&quot; column</code></pre>
+<pre><code>## mutate: new variable &#39;benefits_insurance&#39; (character) with 2 unique values and 0% NA</code></pre>
+<p>Notice how our <code>TEST</code> file now has a new column called <code>benefits_insurance</code> in addition to <code>benefits</code>.</p>
+<p>Ok, now let’s do compensation.</p>
+<pre class="r"><code>#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--################################# COMPENSATION ######################################################## --&gt;
+
+#From: https://stackoverflow.com/questions/26319567/use-grepl-to-search-either-of-multiple-substrings-in-a-text
+#From: https://stackoverflow.com/questions/5823503/pattern-matching-using-a-wildcard
+#From: https://stackoverflow.com/questions/31421077/r-wildcard-matching-for-certain-number-of-terms
+#From: https://www.regular-expressions.info/rlanguage.html
+
+compensation &lt;- c(&#39;\\bsalary\\b&#39;, 
+              &#39;^.*compen.*$&#39;,
+              &#39;\\bpay\\b&#39;
+                     )
+
+#What else should we add?
+ 
+
+compensation_pattern &lt;- paste(compensation, collapse = &quot;|&quot;) #This puts everything from what you put into `compensation` together into a pattern to search for.
+
+compensation_comments &lt;- as.data.frame(Comments_df[grep(compensation_pattern, Comments_df$comments, value = FALSE, perl = TRUE),]) # This takes the pattern you just created and search over the entire column of &quot;comments&quot; in the Comments_df
+
+TEST &lt;- TEST %&gt;%
+    mutate(compensation = ifelse(comments %in% compensation_comments$comments, &quot;Y&quot;,
+                             &quot;N&quot;)) #This modifies the existing object, TEST, from TEST we created before and if any of the comments in the &quot;comments&quot; column match (%in%) the comments exactly, they get a &quot;Y&quot;. If not they get a &quot;N&quot; in the new &quot;compensation&quot; column</code></pre>
+<pre><code>## mutate: new variable &#39;compensation&#39; (character) with 2 unique values and 0% NA</code></pre>
+<p>If you want to roll up sub catagories into a meta-category you can do something like this.</p>
+<pre class="r"><code>TEST &lt;- TEST %&gt;%
+    mutate(Category_Overall = ifelse(subcat_1 == &quot;Y&quot;, &quot;Y&quot;,
+                                     subcat_2 == &quot;Y&quot;, &quot;Y&quot;,
+                                     subcat_3 == &quot;Y&quot;, &quot;Y&quot;,
+                                     &quot;N&quot;))</code></pre>
+<p>If you want to do an Other category, you could do something like this.</p>
+<pre class="r"><code>#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--####################################################################################################### --&gt;
+#&#39; &lt;!--################################ OTHER ################################################################ --&gt;
+
+#From: https://stackoverflow.com/questions/32514453/ifelse-and-in-applied-to-rows-of-a-dataframe-in-r
+
+TEST &lt;- TEST %&gt;%
+    mutate(Other = apply(TEST, 1, function(y){ ifelse(&quot;Y&quot; %in% y, &quot;N&quot;, &quot;Y&quot;)}))</code></pre>
+<pre><code>## mutate: new variable &#39;Other&#39; (character) with 2 unique values and 0% NA</code></pre>
+<pre class="r"><code>end_time &lt;- now()
+
+print(difftime(end_time, start_time))</code></pre>
+<pre><code>## Time difference of 1.105122 secs</code></pre>
+<p>Once you are done you can write to Excel!</p>
+<p>Let’s go ahead and make it fancy while we are here.</p>
+<pre class="r"><code>##################################
+# Comment Report
+##################################
+
+#Creating df for header
+
+INTRO &lt;- c(&quot;Company Name&quot;,
+
+         &quot;Data Source: Glassdoor&quot;,
+
+         &quot;Data As Of: Q1 2022&quot;,
+
+         &quot;Prepared on: 1/06/2022&quot;,
+
+         &quot;Prepared by: YOUR NAME HERE&quot;)
+
+wb &lt;- openxlsx::createWorkbook() #Create a work book
+
+
+#Comment Report
+
+addWorksheet(wb, &quot;Comment Report&quot;) #name the worksheet in Excel
+
+writeData(wb, &quot;Comment Report&quot;, INTRO) #Write your INTRO
+
+
+#Create style
+
+style1 &lt;- createStyle(fontColour = &quot;#000080&quot;, textDecoration = &quot;Bold&quot;) #Choose your custom font color (https://www.rgbtohex.net/) and make it bold. Call it style1
+
+ 
+
+addStyle(wb, style = style1, rows= 1:5, cols = 1, sheet = &quot;Comment Report&quot;) #add this style to your worksheet. Tell it which rows and columns
+
+writeData(wb, &quot;Comment Report&quot;, TEST, startRow = 8) #put your DF (in this case TEST) into the sheet under your writing (row 8)
+
+hs1 &lt;- createStyle(textDecoration = &quot;Bold&quot;) #create a new style for heading
+
+addStyle(wb, style = hs1, rows = 8, cols = 1:50, sheet = &quot;Comment Report&quot;) #Tell it where to go. We&#39;ll do 50 columns in this case so it can grow if needed
+
+#Freeze Panes
+
+#Also check here: https://stackoverflow.com/questions/37677326/applying-style-to-all-sheets-of-a-workbook-using-openxlsx-package-in-r
+
+freezePane(wb, &quot;Comment Report&quot;, firstActiveRow = 9) #Freeze those panes. You know you want to. Tell it where to start.
+
+#Add filter
+
+addFilter(wb, &quot;Comment Report&quot;, row = 8, cols = 1:50) #Add your filter as well. If you&#39;re trying to impress, you might as well go all in :)
+
+#Now we&#39;ll do a fancy save by customizing the file name using paste0 and system time. We&#39;ll also assume this was for the previous month. You&#39;ll also need to make this path the one you want on your computer. 
+
+
+saveWorkbook(wb, paste0(&quot;D:/Blog/Comment_Report_&quot;, format(floor_date(Sys.Date()-months(1), &quot;month&quot;), &quot;%B_%Y&quot;) , &quot;.xlsx&quot;), overwrite = TRUE)</code></pre>
+</div>
